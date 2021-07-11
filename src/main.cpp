@@ -124,65 +124,66 @@ GLFWwindow* initializeWindow()
     return window;
 }
 
-int main(int argc, char*argv[])
+int main(int argc, char* argv[])
 {
     GLFWwindow* window = initializeWindow();
-
-    VertexArray va;
-    VertexBuffer vb(vertices, 6 * 6 * 5 * sizeof(float));
-    VertexBufferLayout layout;
-
-    layout.Push<float>(3);
-    va.AddBuffer(vb, layout);
-
-    Shader shader("Basic.shader");
-    camera = new Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    Renderer renderer;
-
-    glEnable(GL_DEPTH_TEST);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-    // Entering Main Loop
-    while(!glfwWindowShouldClose(window))
+    //this scope is to prevent infinite lope when terminating opengl (https://www.youtube.com/watch?v=bTHqmzjm2UI&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=13)
     {
-        // update last frame
-        float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        VertexArray va;
+        VertexBuffer vb(vertices, 6 * 6 * 5 * sizeof(float));
+        VertexBufferLayout layout;
 
-        // process input would go here
-        processInput(window);
+        layout.Push<float>(3);
+        va.AddBuffer(vb, layout);
 
-        renderer.Clear();
+        Shader shader("Basic.shader");
+        camera = new Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        Renderer renderer;
 
-        shader.Bind();
+        glEnable(GL_DEPTH_TEST);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        shader.setUniform4f("ourColor", 1, 0, 0, 1);
+        // Entering Main Loop
+        while (!glfwWindowShouldClose(window))
+        {
+            // update last frame
+            float currentFrame = glfwGetTime();
+            deltaTime = currentFrame - lastFrame;
+            lastFrame = currentFrame;
 
-        // update projection matrix and pass to shader
-        glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
-        shader.setUniform4Mat("projection", projection);
+            // process input would go here
+            processInput(window);
 
-        // update view matrix and pass to shader
-        glm::mat4 view = camera->getViewMatrix();
-        shader.setUniform4Mat("view", view);
+            renderer.Clear();
 
-        // calculate model matrix and pass to shader
-        glm::mat4 model = glm::mat4(1.0f);
-        shader.setUniform4Mat("model", model);
+            shader.Bind();
 
-        // now render triangles
-        va.Bind();
-        vb.Bind();
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+            shader.setUniform4f("ourColor", 1, 0, 0, 1);
 
-        // End frame
-        glfwSwapBuffers(window);
-        
-        // Detect inputs
-        glfwPollEvents();
+            // update projection matrix and pass to shader
+            glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
+            shader.setUniform4Mat("projection", projection);
+
+            // update view matrix and pass to shader
+            glm::mat4 view = camera->getViewMatrix();
+            shader.setUniform4Mat("view", view);
+
+            // calculate model matrix and pass to shader
+            glm::mat4 model = glm::mat4(1.0f);
+            shader.setUniform4Mat("model", model);
+
+            // now render triangles
+            va.Bind();
+            vb.Bind();
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+
+            // End frame
+            glfwSwapBuffers(window);
+
+            // Detect inputs
+            glfwPollEvents();
+        }
     }
-    
     // Shutdown GLFW
     glfwTerminate();
 	return 0;
