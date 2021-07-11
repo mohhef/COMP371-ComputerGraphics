@@ -5,7 +5,6 @@
 #include <iostream>
 #include <unordered_map>
 
-using namespace std;
 struct ShaderProgramSource {
 	std::string VertexSource;
 	std::string FragmentSource;

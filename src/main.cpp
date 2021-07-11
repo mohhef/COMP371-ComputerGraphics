@@ -91,16 +91,17 @@ void processInput(GLFWwindow* window)
         camera->processMovement(KEY::RIGHT, deltaTime);
 }
 
-int main(int argc, char*argv[])
+GLFWwindow* initializeWindow()
 {
     GLFWwindow* window;
-	/* Initialize the library */
-	if (!glfwInit())
-		return -1;
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    /* Initialize the library */
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Create Window and rendering context using GLFW, resolution is WIDTH x HEIGHT
     window = glfwCreateWindow(WIDTH, HEIGHT, "playground", NULL, NULL);
@@ -108,17 +109,24 @@ int main(int argc, char*argv[])
     {
         cerr << "Failed to create GLFW window" << endl;
         glfwTerminate();
-        return -1;
+        exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(window);
-    
+
 
     // Initialize GLEW
     if (glewInit() != GLEW_OK) {
         cerr << "Failed to create GLEW" << endl;
         glfwTerminate();
-        return -1;
+        exit(EXIT_FAILURE);
     }
+
+    return window;
+}
+
+int main(int argc, char*argv[])
+{
+    GLFWwindow* window = initializeWindow();
 
 	VertexArray va;
 	VertexBuffer vb(vertices, 6 * 6 * 5 * sizeof(float));
@@ -128,13 +136,7 @@ int main(int argc, char*argv[])
 	va.AddBuffer(vb, layout);
 
 	Shader shader("Basic.shader");
-	shader.Bind();
-	shader.setUniform4f("ourColor", 1, 0, 0, 1);
     camera = new Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-	va.Unbind();
-	vb.unBind();
-    shader.Unbind();
 	Renderer renderer;
 
     glEnable(GL_DEPTH_TEST);
@@ -143,10 +145,6 @@ int main(int argc, char*argv[])
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
-		renderer.Clear();
-        shader.Bind();
-        va.Bind();
-        vb.Bind();
         // update last frame
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -154,6 +152,12 @@ int main(int argc, char*argv[])
 
         // process input would go here
         processInput(window);
+
+        renderer.Clear();
+
+        shader.Bind();
+
+        shader.setUniform4f("ourColor", 1, 0, 0, 1);
 
         // update projection matrix and pass to shader
         glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float) WIDTH / (float) HEIGHT, 0.1f, 100.0f);
@@ -168,8 +172,9 @@ int main(int argc, char*argv[])
         shader.setUniform4Mat("model", model);
 
         // now render triangles
+        va.Bind();
+        vb.Bind();
 		glDrawArrays(GL_TRIANGLES, 0, 36);
-        // glBindVertexArray(0);
 
         // End frame
         glfwSwapBuffers(window);
