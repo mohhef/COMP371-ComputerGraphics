@@ -33,47 +33,47 @@ const int HEIGHT = 768;
 const int WIDTH = 1024;
 
 float vertices[] = {
-			-0.5f, -0.5f, -0.5f,  
-			 0.5f, -0.5f, -0.5f,  
-			 0.5f,  0.5f, -0.5f,  
-			 0.5f,  0.5f, -0.5f,  
-			-0.5f,  0.5f, -0.5f,  
-			-0.5f, -0.5f, -0.5f,  
+    -0.5f, -0.5f, -0.5f,  
+    0.5f, -0.5f, -0.5f,  
+    0.5f,  0.5f, -0.5f,  
+    0.5f,  0.5f, -0.5f,  
+    -0.5f,  0.5f, -0.5f,  
+    -0.5f, -0.5f, -0.5f,  
 
-			-0.5f, -0.5f,  0.5f,  
-			 0.5f, -0.5f,  0.5f,  
-			 0.5f,  0.5f,  0.5f,  
-			 0.5f,  0.5f,  0.5f,  
-			-0.5f,  0.5f,  0.5f,  
-			-0.5f, -0.5f,  0.5f,  
+    -0.5f, -0.5f,  0.5f,  
+    0.5f, -0.5f,  0.5f,  
+    0.5f,  0.5f,  0.5f,  
+    0.5f,  0.5f,  0.5f,  
+    -0.5f,  0.5f,  0.5f,  
+    -0.5f, -0.5f,  0.5f,  
 
-			-0.5f,  0.5f,  0.5f,  
-			-0.5f,  0.5f, -0.5f,  
-			-0.5f, -0.5f, -0.5f,  
-			-0.5f, -0.5f, -0.5f,  
-			-0.5f, -0.5f,  0.5f,  
-			-0.5f,  0.5f,  0.5f,  
+    -0.5f,  0.5f,  0.5f,  
+    -0.5f,  0.5f, -0.5f,  
+    -0.5f, -0.5f, -0.5f,  
+    -0.5f, -0.5f, -0.5f,  
+    -0.5f, -0.5f,  0.5f,  
+    -0.5f,  0.5f,  0.5f,  
 
-			 0.5f,  0.5f,  0.5f,  
-			 0.5f,  0.5f, -0.5f,  
-			 0.5f, -0.5f, -0.5f,  
-			 0.5f, -0.5f, -0.5f,  
-			 0.5f, -0.5f,  0.5f,  
-			 0.5f,  0.5f,  0.5f,  
+    0.5f,  0.5f,  0.5f,  
+    0.5f,  0.5f, -0.5f,  
+    0.5f, -0.5f, -0.5f,  
+    0.5f, -0.5f, -0.5f,  
+    0.5f, -0.5f,  0.5f,  
+    0.5f,  0.5f,  0.5f,  
 
-			-0.5f, -0.5f, -0.5f,  
-			 0.5f, -0.5f, -0.5f,  
-			 0.5f, -0.5f,  0.5f,  
-			 0.5f, -0.5f,  0.5f,  
-			-0.5f, -0.5f,  0.5f,  
-			-0.5f, -0.5f, -0.5f,  
+    -0.5f, -0.5f, -0.5f,  
+    0.5f, -0.5f, -0.5f,  
+    0.5f, -0.5f,  0.5f,  
+    0.5f, -0.5f,  0.5f,  
+    -0.5f, -0.5f,  0.5f,  
+    -0.5f, -0.5f, -0.5f,  
 
-			-0.5f,  0.5f, -0.5f,  
-			 0.5f,  0.5f, -0.5f,  
-			 0.5f,  0.5f,  0.5f,  
-			 0.5f,  0.5f,  0.5f,  
-			-0.5f,  0.5f,  0.5f,  
-			-0.5f,  0.5f, -0.5f  
+    -0.5f,  0.5f, -0.5f,  
+    0.5f,  0.5f, -0.5f,  
+    0.5f,  0.5f,  0.5f,  
+    0.5f,  0.5f,  0.5f,  
+    -0.5f,  0.5f,  0.5f,  
+    -0.5f,  0.5f, -0.5f  
 };
 
 void processInput(GLFWwindow* window) 
@@ -128,16 +128,16 @@ int main(int argc, char*argv[])
 {
     GLFWwindow* window = initializeWindow();
 
-	VertexArray va;
-	VertexBuffer vb(vertices, 6 * 6 * 5 * sizeof(float));
-	VertexBufferLayout layout;
+    VertexArray va;
+    VertexBuffer vb(vertices, 6 * 6 * 5 * sizeof(float));
+    VertexBufferLayout layout;
 
-	layout.Push<float>(3);
-	va.AddBuffer(vb, layout);
+    layout.Push<float>(3);
+    va.AddBuffer(vb, layout);
 
-	Shader shader("Basic.shader");
+    Shader shader("Basic.shader");
     camera = new Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	Renderer renderer;
+    Renderer renderer;
 
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -174,7 +174,7 @@ int main(int argc, char*argv[])
         // now render triangles
         va.Bind();
         vb.Bind();
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // End frame
         glfwSwapBuffers(window);
