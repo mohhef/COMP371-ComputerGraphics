@@ -1,12 +1,13 @@
 #include "Renderer.h"
 #include <iostream>
 #include "Shader.h"
-void GLClearError()
+
+void glClearError()
 {
 	while (glGetError() != GL_NO_ERROR);
 }
 
-bool GLLogCall(const char* function, const char* file, int line) {
+bool glLogCall(const char* function, const char* file, int line) {
 	while (GLenum error = glGetError()) {
 		std::cout << "[OpenGL Error] (" << error << ")" << function << " " <<
 			" " << file << " " << line << std::endl;
@@ -15,26 +16,23 @@ bool GLLogCall(const char* function, const char* file, int line) {
 	return true;
 }
 
-void Renderer::Clear() const
+void Renderer::clear() const
 {
 	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
-void Renderer::Draw(const VertexArray& va, const Shader& shader) const
+void Renderer::draw(const VertexArray& va, const Shader& shader) const
 {
-	shader.Bind();
-	va.Bind();
+	shader.bind();
+	va.bind();
 	GLCall(glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, nullptr));
 }
 
-void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
+void Renderer::draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
 {
-	shader.Bind();
-	va.Bind();
-	ib.Bind();
-	//It'll draw the currently bound buffer
-	//gl is number of indices not vertexes
-	//nullptr because we already use bind
-	GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
+	shader.bind();
+	va.bind();
+	ib.bind();
+	GLCall(glDrawElements(GL_TRIANGLES, ib.getCount(), GL_UNSIGNED_INT, nullptr));
 
 }

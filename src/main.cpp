@@ -26,8 +26,11 @@ using namespace std;
 
 Camera* camera = NULL;
 
+const double pi = 3.14159265358979323846;
+
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+int modelIndex = 0;
 
 const int HEIGHT = 768;
 const int WIDTH = 1024;
@@ -76,6 +79,47 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f  
 };
 
+vector<vector<glm::vec3>> cubePositions =
+{
+    {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, -1.0f, 0.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 1.0f, 0.0f),
+        glm::vec3(2.0f, 0.0f, -1.0f),
+        glm::vec3(0.0f, 0.0f, -1.0f),
+        glm::vec3(0.0f, 0.0f, -2.0f),
+    },
+};
+
+vector<vector<glm::vec3>> wallPositions =
+{
+    {
+        glm::vec3(0.0f, 0.0f, -30.0f),
+        glm::vec3(4.5f, 12.0f, -30.0f),
+        glm::vec3(-6.0f, 9.5f, -30.0f),
+        glm::vec3(-4.0f, 8.5f, -30.0f),
+        glm::vec3(-10.5f, 12.0f, -30.0f),
+        glm::vec3(-6.0f, 15.0f, -30.0f)
+    },
+};
+
+vector<vector<glm::vec3>> wallScales =
+{
+    {
+        glm::vec3(24.0f, 15.0f, 2.0f),
+        glm::vec3(15.0f, 9.0f, 2.0f),
+        glm::vec3(2.0f, 4.0f, 2.0f),
+        glm::vec3(2.0f, 2.0f, 2.0f),
+        glm::vec3(3.0f, 9.0f, 2.0f),
+        glm::vec3(6.0f, 3.0f, 2.0f)
+    },
+};
+
+vector<vector<glm::mat4>> modelMatrices;
+
 void processInput(GLFWwindow* window) 
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -89,6 +133,47 @@ void processInput(GLFWwindow* window)
         camera->processMovement(KEY::LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         camera->processMovement(KEY::RIGHT, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        for (int i = 0; i < modelMatrices.at(modelIndex).size(); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(0.0f, 0.25f, 0.0f));
+            modelMatrices.at(modelIndex).at(i) = model * modelMatrices.at(modelIndex).at(i);
+        }
+
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        for (int i = 0; i < modelMatrices.at(modelIndex).size(); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(0.0f, -0.25f, 0.0f));
+            modelMatrices.at(modelIndex).at(i) = model * modelMatrices.at(modelIndex).at(i);
+        }
+
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        for (int i = 0; i < modelMatrices.at(modelIndex).size(); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(-0.25f, 0.0f, 0.0f));
+            modelMatrices.at(modelIndex).at(i) = modelMatrices.at(modelIndex).at(i) * model;
+        }
+
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        for (int i = 0; i < modelMatrices.at(modelIndex).size(); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(0.25f, 0.0f, 0.0f));
+            modelMatrices.at(modelIndex).at(i) = model * modelMatrices.at(modelIndex).at(i);
+        }
+
+    }
 }
 
 GLFWwindow* initializeWindow()
@@ -121,27 +206,77 @@ GLFWwindow* initializeWindow()
         exit(EXIT_FAILURE);
     }
 
+    // background color
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     return window;
+}
+
+void setObjectModel(Shader* shader)
+{
+    shader->setUniform4Vec("ourColor", glm::vec4(0, 1, 1, 1));
+    int numCubePieces = cubePositions.at(modelIndex).size();    
+    float time = (float)glfwGetTime();
+    for (int i = 0; i < numCubePieces; i++)
+    {
+        
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -0.01f));
+        modelMatrices.at(modelIndex).at(i) = model * modelMatrices.at(modelIndex).at(i);
+        
+
+        shader->setUniform4Mat("model", modelMatrices.at(modelIndex).at(i));
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+}
+
+void setWallModel(Shader* shader)
+{
+    shader->setUniform4Vec("ourColor", glm::vec4(0.63f, 0.63f, 0.63f, 1));
+    int numWallPieces = wallPositions.at(modelIndex).size();
+    for (int i = 0; i < numWallPieces; i++)
+    {
+        // calculate model matrix for each object and pass it to shader before drawing
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, wallPositions.at(modelIndex).at(i));
+        model = glm::scale(model, wallScales.at(modelIndex).at(i));
+        shader->setUniform4Mat("model", model);
+
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 }
 
 int main(int argc, char* argv[])
 {
     GLFWwindow* window = initializeWindow();
-    //this scope is to prevent infinite lope when terminating opengl (https://www.youtube.com/watch?v=bTHqmzjm2UI&list=PLlrATfBNZ98foTJPJ_Ev03o2oq3-GGOS2&index=13)
     {
-        VertexArray va;
-        VertexBuffer vb(vertices, 6 * 6 * 5 * sizeof(float));
+        VertexArray vA;
+        VertexBuffer vB(vertices, sizeof(vertices));
         VertexBufferLayout layout;
 
-        layout.Push<float>(3);
-        va.AddBuffer(vb, layout);
+        layout.push<float>(3);
+        vA.addBuffer(vB, layout);
 
-        Shader shader("Basic.shader");
-        camera = new Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        Shader* shader = new Shader("vertex_fragment.shader");
+        camera = new Camera(glm::vec3(0.0f, 0.0f, 40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         Renderer renderer;
 
         glEnable(GL_DEPTH_TEST);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        // initialize model matricies for each cube within each model object
+        modelMatrices.resize(cubePositions.size());
+        for (int i = 0; i < cubePositions.size(); i++)
+        {
+            modelMatrices.at(i).resize(cubePositions.at(i).size());
+
+            for (int j = 0; j < cubePositions.at(i).size(); j++)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::translate(model, cubePositions.at(i).at(j));
+                modelMatrices.at(i).at(j) = model;
+            }
+
+        }
 
         // Entering Main Loop
         while (!glfwWindowShouldClose(window))
@@ -154,28 +289,27 @@ int main(int argc, char* argv[])
             // process input would go here
             processInput(window);
 
-            renderer.Clear();
+            renderer.clear();
 
-            shader.Bind();
+            shader->bind();
+            vA.bind();
+            vB.bind();
 
-            shader.setUniform4f("ourColor", 1, 0, 0, 1);
+            shader->setUniform4f("ourColor", 1, 0, 0, 1);
 
             // update projection matrix and pass to shader
-            glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-            shader.setUniform4Mat("projection", projection);
+            glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 200.0f);
+            shader->setUniform4Mat("projection", projection);
 
             // update view matrix and pass to shader
             glm::mat4 view = camera->getViewMatrix();
-            shader.setUniform4Mat("view", view);
+            shader->setUniform4Mat("view", view);
 
-            // calculate model matrix and pass to shader
-            glm::mat4 model = glm::mat4(1.0f);
-            shader.setUniform4Mat("model", model);
+            // render wall
+            setWallModel(shader);
 
-            // now render triangles
-            va.Bind();
-            vb.Bind();
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            // render model
+            setObjectModel(shader);
 
             // End frame
             glfwSwapBuffers(window);
@@ -184,7 +318,8 @@ int main(int argc, char* argv[])
             glfwPollEvents();
         }
     }
+
     // Shutdown GLFW
     glfwTerminate();
-	return 0;
+    return 0;
 }
