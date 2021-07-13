@@ -197,6 +197,7 @@ GLFWwindow* initializeWindow()
         exit(EXIT_FAILURE);
     }
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
 
 
     // Initialize GLEW
