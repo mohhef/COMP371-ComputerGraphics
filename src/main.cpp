@@ -109,6 +109,12 @@ vector<vector<glm::vec3>> wallScales =
     },
 };
 
+// initial configuration position of wall (to align with XZ plane)
+vector<glm::vec3> wallPosition =
+{
+    glm::vec3(0.0f, 15.0f, 0.0f),
+};
+
 // initial configuration of cubes for model
 vector<vector<glm::vec3>> modelCubePositions =
 {
@@ -134,7 +140,7 @@ vector<glm::mat4> modelScale
 // initial configuration position of model (to align with hole)
 vector<glm::vec3> modelPosition =
 {
-    glm::vec3(-8.0f, 12.5f, 20.0f),
+    glm::vec3(-8.0f, 27.5f, 20.0f),
 };
 
 // modified throughout run - to reset between runs - bound to a single model (modelIndex)
@@ -204,12 +210,15 @@ void setWallModel(Shader* shader)
     for (int i = 0; i < numWallPieces; i++)
     {
         // calculate model matrix for each object and pass it to shader before drawing
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(scaleFactor));
-        model = glm::translate(model, wallCubePositions.at(modelIndex).at(i));
-        model = glm::scale(model, wallScales.at(modelIndex).at(i));
+        glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(modelIndex));
+    
+        // unit matrix * wall_scale * wall_translation (align with XZ plane) * wall_cube_scale * wall_cube_translate
+        glm::mat4 model = glm::mat4(1.0f)
+            * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor))
+            * initialPos
+            * glm::translate(glm::mat4(1.0f), wallCubePositions.at(modelIndex).at(i)) 
+            * glm::scale(glm::mat4(1.0f), wallScales.at(modelIndex).at(i));
 
-        // unit matrix * wall_scale * wall_cube_scale * wall_cube_translate
         shader->setUniform4Mat("model", model);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -332,7 +341,7 @@ int main(int argc, char* argv[])
         vA.addBuffer(vB, layout);
 
         Shader* shader = new Shader("vertex_fragment.shader");
-        camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 50.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         Renderer renderer;
 
         glEnable(GL_DEPTH_TEST);
