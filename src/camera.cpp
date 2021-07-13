@@ -42,7 +42,6 @@ void Camera::processMovement(KEY key, float deltaTime)
 
 glm::mat4 Camera::getViewMatrix()
 {
-	// return glm::lookAt(position, glm::vec3(0,0,0), up);
 	return glm::lookAt(position, target, up);
 }
 
