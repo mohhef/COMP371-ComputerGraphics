@@ -4,20 +4,22 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 
+// Assertion check helper for gl commands
 #define ASSERT(x) if (!(x)) __debugbreak();
-#define GLCall(x) GLClearError();\
+#define GLCall(x) glClearError();\
     x;\
-    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+    ASSERT(glLogCall(#x, __FILE__, __LINE__))
 
-//clear all error by emptying error queue using glGetError
-void GLClearError();
-bool GLLogCall(const char* function, const char* file, int line);
+// Empty error queue
+void glClearError();
+bool glLogCall(const char* function, const char* file, int line);
 
 class Renderer
 {
 public:
-	void Clear() const;
-	void Draw(const VertexArray& va, const Shader& shader) const;
-	void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+	void clear() const;
+	void draw(const VertexArray& va, const Shader& shader) const;
+	// draw function should be used for Element Buffer Objects (indices)
+	void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
 
 };
