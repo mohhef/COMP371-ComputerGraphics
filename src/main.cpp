@@ -22,6 +22,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
+
 using namespace std;
 
 Camera* camera = NULL;
@@ -30,7 +31,10 @@ const double pi = 3.14159265358979323846;
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
+float wallZPos = -10.0f;
 int modelIndex = 0;
+
+float scaleFactor = 1.0f;
 
 const int HEIGHT = 768;
 const int WIDTH = 1024;
@@ -79,7 +83,34 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f  
 };
 
-vector<vector<glm::vec3>> cubePositions =
+// initial configuration of cubes for wall
+vector<vector<glm::vec3>> wallCubePositions =
+{
+    {
+        glm::vec3(0.0f, 0.0f, wallZPos),
+        glm::vec3(4.5f, 12.0f, wallZPos),
+        glm::vec3(-6.0f, 9.5f, wallZPos),
+        glm::vec3(-4.0f, 8.5f, wallZPos),
+        glm::vec3(-10.5f, 12.0f, wallZPos),
+        glm::vec3(-6.0f, 15.0f, wallZPos)
+    },
+};
+
+// initial configuration scale of wall cubes
+vector<vector<glm::vec3>> wallScales =
+{
+    {
+        glm::vec3(24.0f, 15.0f, 2.0f),
+        glm::vec3(15.0f, 9.0f, 2.0f),
+        glm::vec3(2.0f, 4.0f, 2.0f),
+        glm::vec3(2.0f, 2.0f, 2.0f),
+        glm::vec3(3.0f, 9.0f, 2.0f),
+        glm::vec3(6.0f, 3.0f, 2.0f)
+    },
+};
+
+// initial configuration of cubes for model
+vector<vector<glm::vec3>> modelCubePositions =
 {
     {
         glm::vec3(0.0f, 0.0f, 0.0f),
@@ -94,87 +125,23 @@ vector<vector<glm::vec3>> cubePositions =
     },
 };
 
-vector<vector<glm::vec3>> wallPositions =
+// initial configuration scale of model cubes
+vector<glm::mat4> modelScale
 {
-    {
-        glm::vec3(0.0f, 0.0f, -30.0f),
-        glm::vec3(4.5f, 12.0f, -30.0f),
-        glm::vec3(-6.0f, 9.5f, -30.0f),
-        glm::vec3(-4.0f, 8.5f, -30.0f),
-        glm::vec3(-10.5f, 12.0f, -30.0f),
-        glm::vec3(-6.0f, 15.0f, -30.0f)
-    },
+    glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
 };
 
-vector<vector<glm::vec3>> wallScales =
+// initial configuration position of model (to align with hole)
+vector<glm::vec3> modelPosition =
 {
-    {
-        glm::vec3(24.0f, 15.0f, 2.0f),
-        glm::vec3(15.0f, 9.0f, 2.0f),
-        glm::vec3(2.0f, 4.0f, 2.0f),
-        glm::vec3(2.0f, 2.0f, 2.0f),
-        glm::vec3(3.0f, 9.0f, 2.0f),
-        glm::vec3(6.0f, 3.0f, 2.0f)
-    },
+    glm::vec3(-8.0f, 12.5f, 20.0f),
 };
 
-vector<vector<glm::mat4>> modelMatrices;
+// modified throughout run - to reset between runs - bound to a single model (modelIndex)
+vector<glm::mat4> modelTransMat;
 
-void processInput(GLFWwindow* window) 
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-    
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        camera->processMovement(KEY::UP, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        camera->processMovement(KEY::DOWN, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        camera->processMovement(KEY::LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        camera->processMovement(KEY::RIGHT, deltaTime);
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        for (int i = 0; i < modelMatrices.at(modelIndex).size(); i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(0.0f, 0.25f, 0.0f));
-            modelMatrices.at(modelIndex).at(i) = model * modelMatrices.at(modelIndex).at(i);
-        }
-
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        for (int i = 0; i < modelMatrices.at(modelIndex).size(); i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(0.0f, -0.25f, 0.0f));
-            modelMatrices.at(modelIndex).at(i) = model * modelMatrices.at(modelIndex).at(i);
-        }
-
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        for (int i = 0; i < modelMatrices.at(modelIndex).size(); i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(-0.25f, 0.0f, 0.0f));
-            modelMatrices.at(modelIndex).at(i) = modelMatrices.at(modelIndex).at(i) * model;
-        }
-
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        for (int i = 0; i < modelMatrices.at(modelIndex).size(); i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(0.25f, 0.0f, 0.0f));
-            modelMatrices.at(modelIndex).at(i) = model * modelMatrices.at(modelIndex).at(i);
-        }
-
-    }
-}
+// modified throughout run - to reset between runs - bound to a single model (modelIndex)
+vector<glm::mat4> modelRotMat;
 
 GLFWwindow* initializeWindow()
 {
@@ -215,17 +182,18 @@ GLFWwindow* initializeWindow()
 void setObjectModel(Shader* shader)
 {
     shader->setUniform4Vec("ourColor", glm::vec4(0, 1, 1, 1));
-    int numCubePieces = cubePositions.at(modelIndex).size();    
+    int numCubePieces = modelCubePositions.at(modelIndex).size();    
     float time = (float)glfwGetTime();
     for (int i = 0; i < numCubePieces; i++)
     {
         
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f, 0.0f, -0.01f));
-        modelMatrices.at(modelIndex).at(i) = model * modelMatrices.at(modelIndex).at(i);
+        glm::mat4 transZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -(float)glfwGetTime()));
+        glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(modelIndex));
         
+        // unit matrix * z_translation * model_scale * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
+        glm::mat4 model = glm::mat4(1.0f) * transZ * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * initialPos * modelRotMat.at(i) * modelScale.at(modelIndex) * modelTransMat.at(i);
 
-        shader->setUniform4Mat("model", modelMatrices.at(modelIndex).at(i));
+        shader->setUniform4Mat("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 }
@@ -233,16 +201,120 @@ void setObjectModel(Shader* shader)
 void setWallModel(Shader* shader)
 {
     shader->setUniform4Vec("ourColor", glm::vec4(0.63f, 0.63f, 0.63f, 1));
-    int numWallPieces = wallPositions.at(modelIndex).size();
+    int numWallPieces = wallCubePositions.at(modelIndex).size();
     for (int i = 0; i < numWallPieces; i++)
     {
         // calculate model matrix for each object and pass it to shader before drawing
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, wallPositions.at(modelIndex).at(i));
+        model = glm::scale(model, glm::vec3(scaleFactor));
+        model = glm::translate(model, wallCubePositions.at(modelIndex).at(i));
         model = glm::scale(model, wallScales.at(modelIndex).at(i));
+
+        // unit matrix * wall_scale * wall_cube_scale * wall_cube_translate
         shader->setUniform4Mat("model", model);
 
         glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+}
+
+void resetTransMat()
+{
+    modelTransMat.resize(modelCubePositions.at(modelIndex).size());
+    for (int i = 0; i < modelCubePositions.at(modelIndex).size(); i++)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, modelCubePositions.at(modelIndex).at(i));
+        modelTransMat.at(i) = model;
+    }
+}
+
+void resetRotMat()
+{
+    modelRotMat.resize(modelCubePositions.at(modelIndex).size());
+    for (int i = 0; i < modelCubePositions.at(modelIndex).size(); i++)
+    {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        modelRotMat.at(i) = model;
+    }
+}
+
+void resetModel()
+{
+    resetTransMat();
+    resetRotMat();
+    glfwSetTime(0.0f);
+    scaleFactor = 1.0f;
+}
+
+void processInput(GLFWwindow* window)
+{
+    // closes window
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
+
+    // rotate of camera around world
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        camera->processMovement(KEY::UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        camera->processMovement(KEY::DOWN, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        camera->processMovement(KEY::LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        camera->processMovement(KEY::RIGHT, deltaTime);
+
+    // reset model
+    if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
+        resetModel();
+
+    // scale model
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+    {
+        if (scaleFactor < 1.25f)
+            scaleFactor += 0.01f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+    {
+        if (scaleFactor > 0.75f)
+            scaleFactor -= 0.01f;
+    }
+
+    // rotate model
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        for (int i = 0; i < modelRotMat.size(); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::rotate(model, glm::radians(5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            modelRotMat.at(i) = model * modelRotMat.at(i);
+        }
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        for (int i = 0; i < modelRotMat.size(); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::rotate(model, glm::radians(-5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            modelRotMat.at(i) = model * modelRotMat.at(i);
+        }
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        for (int i = 0; i < modelRotMat.size(); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::rotate(model, glm::radians(5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            modelRotMat.at(i) = model * modelRotMat.at(i);
+        }
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        for (int i = 0; i < modelRotMat.size(); i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::rotate(model, glm::radians(-5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            modelRotMat.at(i) = model * modelRotMat.at(i);
+        }
     }
 }
 
@@ -254,30 +326,22 @@ int main(int argc, char* argv[])
         VertexBuffer vB(vertices, sizeof(vertices));
         VertexBufferLayout layout;
 
+        cout << sizeof(vertices) << endl;
+        cout << 6 * 6 * 3 * sizeof(float) << endl;
+
         layout.push<float>(3);
         vA.addBuffer(vB, layout);
 
         Shader* shader = new Shader("vertex_fragment.shader");
-        camera = new Camera(glm::vec3(0.0f, 0.0f, 40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 50.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         Renderer renderer;
 
         glEnable(GL_DEPTH_TEST);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         // initialize model matricies for each cube within each model object
-        modelMatrices.resize(cubePositions.size());
-        for (int i = 0; i < cubePositions.size(); i++)
-        {
-            modelMatrices.at(i).resize(cubePositions.at(i).size());
-
-            for (int j = 0; j < cubePositions.at(i).size(); j++)
-            {
-                glm::mat4 model = glm::mat4(1.0f);
-                model = glm::translate(model, cubePositions.at(i).at(j));
-                modelMatrices.at(i).at(j) = model;
-            }
-
-        }
+        resetTransMat();
+        resetRotMat();
 
         // Entering Main Loop
         while (!glfwWindowShouldClose(window))
