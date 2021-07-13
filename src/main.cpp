@@ -186,12 +186,11 @@ void setObjectModel(Shader* shader)
     float time = (float)glfwGetTime();
     for (int i = 0; i < numCubePieces; i++)
     {
-        
         glm::mat4 transZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -(float)glfwGetTime()));
         glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(modelIndex));
         
-        // unit matrix * z_translation * model_scale * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
-        glm::mat4 model = glm::mat4(1.0f) * transZ * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * initialPos * modelRotMat.at(i) * modelScale.at(modelIndex) * modelTransMat.at(i);
+        // unit matrix * scaling input * z_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
+        glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * transZ * initialPos * modelRotMat.at(i) * modelScale.at(modelIndex) * modelTransMat.at(i);
 
         shader->setUniform4Mat("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
