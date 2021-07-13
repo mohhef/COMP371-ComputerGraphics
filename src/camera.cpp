@@ -4,11 +4,12 @@
 #include <iostream>
 using namespace std;
 
-Camera::Camera(glm::vec3 position, glm::vec3 worldUp)
+Camera::Camera(glm::vec3 position, glm::vec3 worldUp, glm::vec3 target)
 {
 	this->position = position;
 	this->worldUp = worldUp;
-	
+	this->target = target;
+
 	yaw = DEFAULT_YAW;
 	pitch = DEFAULT_PITCH;
 
@@ -41,7 +42,8 @@ void Camera::processMovement(KEY key, float deltaTime)
 
 glm::mat4 Camera::getViewMatrix()
 {
-	return glm::lookAt(position, glm::vec3(0,0,0), up);
+	// return glm::lookAt(position, glm::vec3(0,0,0), up);
+	return glm::lookAt(position, target, up);
 }
 
 // SHOULD USE THIS FOR PAN AND TILT ONLY AFTER INITIAL SETUP

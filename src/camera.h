@@ -22,6 +22,7 @@ public:
 	glm::vec3 up;
 	glm::vec3 right;
 	glm::vec3 worldUp;
+	glm::vec3 target;
 
 	float yaw;
 	float pitch;
@@ -30,7 +31,7 @@ public:
 	float mouseSensitivity;
 	float zoom;
 
-	Camera(glm::vec3 position, glm::vec3 worldUp);
+	Camera(glm::vec3 position, glm::vec3 worldUp, glm::vec3 target);
 
 	void processMovement(KEY key, float deltaTime);
 	
