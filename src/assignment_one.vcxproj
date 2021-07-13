@@ -145,8 +145,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Axes.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
+    <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -155,8 +157,10 @@
     <ClCompile Include="VertexBufferLayout.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Axes.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="Line.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="VertexArray.h" />

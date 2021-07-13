@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "Axes.h"
 #include <iostream>
 #include "Shader.h"
 void GLClearError()
@@ -32,9 +33,16 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 	shader.Bind();
 	va.Bind();
 	ib.Bind();
-	//It'll draw the currently bound buffer
+	//It'll draw the currently bsound buffer
 	//gl is number of indices not vertexes
 	//nullptr because we already use bind
 	GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount(), GL_UNSIGNED_INT, nullptr));
 
+}
+
+void Renderer::DrawAxes(Shader& shader)
+{
+	shader.setUniform4f("ourColor", 1.0, 1.0, 0.0, 1.0);
+	shader.Bind();
+	GLCall(glDrawArrays(GL_LINES, 0, 2));
 }

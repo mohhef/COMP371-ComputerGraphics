@@ -1,0 +1,5 @@
+class Line {
+
+public:
+	Line();
+};
