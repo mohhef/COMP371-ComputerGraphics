@@ -10,149 +10,25 @@
 #define GLEW_STATIC 1
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
 #include "Shader.h"
 #include "camera.h"
 
-#include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
+#include "Constants.h"
 
 using namespace std;
-
-Camera* camera = NULL;
-
-const double pi = 3.14159265358979323846;
-
-float deltaTime = 0.0f;
-float lastFrame = 0.0f;
-float wallZPos = -10.0f;
-int modelIndex = 0;
-
-float scaleFactor = 1.0f;
-
-const int HEIGHT = 768;
-const int WIDTH = 1024;
-
-float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  
-    0.5f, -0.5f, -0.5f,  
-    0.5f,  0.5f, -0.5f,  
-    0.5f,  0.5f, -0.5f,  
-    -0.5f,  0.5f, -0.5f,  
-    -0.5f, -0.5f, -0.5f,  
-
-    -0.5f, -0.5f,  0.5f,  
-    0.5f, -0.5f,  0.5f,  
-    0.5f,  0.5f,  0.5f,  
-    0.5f,  0.5f,  0.5f,  
-    -0.5f,  0.5f,  0.5f,  
-    -0.5f, -0.5f,  0.5f,  
-
-    -0.5f,  0.5f,  0.5f,  
-    -0.5f,  0.5f, -0.5f,  
-    -0.5f, -0.5f, -0.5f,  
-    -0.5f, -0.5f, -0.5f,  
-    -0.5f, -0.5f,  0.5f,  
-    -0.5f,  0.5f,  0.5f,  
-
-    0.5f,  0.5f,  0.5f,  
-    0.5f,  0.5f, -0.5f,  
-    0.5f, -0.5f, -0.5f,  
-    0.5f, -0.5f, -0.5f,  
-    0.5f, -0.5f,  0.5f,  
-    0.5f,  0.5f,  0.5f,  
-
-    -0.5f, -0.5f, -0.5f,  
-    0.5f, -0.5f, -0.5f,  
-    0.5f, -0.5f,  0.5f,  
-    0.5f, -0.5f,  0.5f,  
-    -0.5f, -0.5f,  0.5f,  
-    -0.5f, -0.5f, -0.5f,  
-
-    -0.5f,  0.5f, -0.5f,  
-    0.5f,  0.5f, -0.5f,  
-    0.5f,  0.5f,  0.5f,  
-    0.5f,  0.5f,  0.5f,  
-    -0.5f,  0.5f,  0.5f,  
-    -0.5f,  0.5f, -0.5f  
-};
-
-float axesVertices[] = {
-			0.0f, 0.0f, 0.0f,
-			1.0f, 0.0f, 0.0f
-};
-
-// initial configuration of cubes for wall
-vector<vector<glm::vec3>> wallCubePositions =
-{
-    {
-        glm::vec3(0.0f, 0.0f, wallZPos),
-        glm::vec3(4.5f, 12.0f, wallZPos),
-        glm::vec3(-6.0f, 9.5f, wallZPos),
-        glm::vec3(-4.0f, 8.5f, wallZPos),
-        glm::vec3(-10.5f, 12.0f, wallZPos),
-        glm::vec3(-6.0f, 15.0f, wallZPos)
-    },
-};
-
-// initial configuration scale of wall cubes
-vector<vector<glm::vec3>> wallScales =
-{
-    {
-        glm::vec3(24.0f, 15.0f, 2.0f),
-        glm::vec3(15.0f, 9.0f, 2.0f),
-        glm::vec3(2.0f, 4.0f, 2.0f),
-        glm::vec3(2.0f, 2.0f, 2.0f),
-        glm::vec3(3.0f, 9.0f, 2.0f),
-        glm::vec3(6.0f, 3.0f, 2.0f)
-    },
-};
-
-// initial configuration position of wall (to align with XZ plane)
-vector<glm::vec3> wallPosition =
-{
-    glm::vec3(0.0f, 15.0f, 0.0f),
-};
-
-// initial configuration of cubes for model
-vector<vector<glm::vec3>> modelCubePositions =
-{
-    {
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(0.0f, 1.0f, 0.0f),
-        glm::vec3(0.0f, -1.0f, 0.0f),
-        glm::vec3(1.0f, 0.0f, 0.0f),
-        glm::vec3(2.0f, 0.0f, 0.0f),
-        glm::vec3(2.0f, 1.0f, 0.0f),
-        glm::vec3(2.0f, 0.0f, -1.0f),
-        glm::vec3(0.0f, 0.0f, -1.0f),
-        glm::vec3(0.0f, 0.0f, -2.0f),
-    },
-};
-
-// initial configuration scale of model cubes
-vector<glm::mat4> modelScale
-{
-    glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
-};
-
-// initial configuration position of model (to align with hole)
-vector<glm::vec3> modelPosition =
-{
-    glm::vec3(-8.0f, 27.5f, 20.0f),
-};
 
 // modified throughout run - to reset between runs - bound to a single model (modelIndex)
 vector<glm::mat4> modelTransMat;
 
 // modified throughout run - to reset between runs - bound to a single model (modelIndex)
 vector<glm::mat4> modelRotMat;
+Camera* camera = NULL;
 
 GLFWwindow* initializeWindow()
 {
@@ -188,46 +64,6 @@ GLFWwindow* initializeWindow()
     // background color
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     return window;
-}
-
-void setObjectModel(Shader* shader)
-{
-    shader->setUniform4Vec("ourColor", glm::vec4(0, 1, 1, 1));
-    int numCubePieces = modelCubePositions.at(modelIndex).size();    
-    float time = (float)glfwGetTime();
-    for (int i = 0; i < numCubePieces; i++)
-    {
-        glm::mat4 transZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -(float)glfwGetTime()));
-        glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(modelIndex));
-        
-        // unit matrix * scaling input * z_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
-        glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * transZ * initialPos * modelRotMat.at(i) * modelScale.at(modelIndex) * modelTransMat.at(i);
-
-        shader->setUniform4Mat("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
-}
-
-void setWallModel(Shader* shader)
-{
-    shader->setUniform4Vec("ourColor", glm::vec4(0.63f, 0.63f, 0.63f, 1));
-    int numWallPieces = wallCubePositions.at(modelIndex).size();
-    for (int i = 0; i < numWallPieces; i++)
-    {
-        // calculate model matrix for each object and pass it to shader before drawing
-        glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(modelIndex));
-    
-        // unit matrix * wall_scale * wall_translation (align with XZ plane) * wall_cube_scale * wall_cube_translate
-        glm::mat4 model = glm::mat4(1.0f)
-            * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor))
-            * initialPos
-            * glm::translate(glm::mat4(1.0f), wallCubePositions.at(modelIndex).at(i)) 
-            * glm::scale(glm::mat4(1.0f), wallScales.at(modelIndex).at(i));
-
-        shader->setUniform4Mat("model", model);
-
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
 }
 
 void resetTransMat()
@@ -380,9 +216,9 @@ int main(int argc, char* argv[])
 
             renderer.clear();
 
-            shader->bind();
-            vA.bind();
-            vB.bind();
+			shader->bind();
+			vA.bind();
+			vB.bind();
 
             shader->setUniform4f("ourColor", 1, 0, 0, 1);
 
@@ -394,39 +230,11 @@ int main(int argc, char* argv[])
             glm::mat4 view = camera->getViewMatrix();
             shader->setUniform4Mat("view", view);
 
-			glm::mat4 model = glm::mat4(1.0f);
 					
             // render wall
-            setWallModel(shader);
-
-            // render model
-            setObjectModel(shader);
-
-			axesShader->bind();
-			axesShader->setUniform4Mat("view", view);
-			axesShader->setUniform4Mat("projection", projection);
-			axesShader->setUniform4Mat("model", model);
-
-			vaAxes.bind();
-			vbAxes.bind();
-
-			axesShader->setUniform1i("xAxis", 1);
-			axesShader->setUniform4Vec("ourColor", glm::vec4(1.0, 0.0, 0.0, 1.0));
-			axesShader->setUniform4Mat("model", model);
-			renderer.DrawAxes(vaAxes, *axesShader);
-
-			model = glm::rotate(model, glm::radians(-85.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-			axesShader->setUniform1i("yAxis", 1);
-			axesShader->setUniform4Vec("ourColor", glm::vec4(0.0, 1.0, 0.0, 1.0));
-			axesShader->setUniform4Mat("model", model);
-			renderer.DrawAxes(vaAxes, *axesShader);
-
-
-			model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-			axesShader->setUniform1i("zAxis", 1);
-			axesShader->setUniform4Mat("model", model);
-			axesShader->setUniform4Vec("ourColor", glm::vec4(0.0, 0.0, 1.0, 1.0));
-			renderer.DrawAxes(vaAxes, *axesShader);
+            renderer.drawWall(vA, *shader);
+            renderer.drawObject(vA, *shader,  modelRotMat, modelTransMat);
+            renderer.drawAxes(vaAxes, *axesShader, view, projection);
 
             // End frame
             glfwSwapBuffers(window);
