@@ -171,15 +171,15 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
     {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        Renderer::getInstance().setRenderMethod(GL_POINTS);
     }
 
     if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        Renderer::getInstance().setRenderMethod(GL_LINES);
     }
 
     if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        Renderer::getInstance().setRenderMethod(GL_TRIANGLES);
     }
 }
 
@@ -210,7 +210,7 @@ int main(int argc, char* argv[])
         Shader* axesShader = new Shader("axes.shader");
 
         camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-        Renderer renderer;
+        Renderer& renderer = Renderer::getInstance();
 
         glEnable(GL_DEPTH_TEST);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
