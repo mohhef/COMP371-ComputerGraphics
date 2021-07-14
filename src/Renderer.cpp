@@ -36,3 +36,10 @@ void Renderer::draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 	GLCall(glDrawElements(GL_TRIANGLES, ib.getCount(), GL_UNSIGNED_INT, nullptr));
 
 }
+
+void Renderer::DrawAxes(VertexArray& va, Shader& shader)
+{
+	va.bind();
+	shader.bind();
+	GLCall(glDrawArrays(GL_LINES, 0, 2));
+}

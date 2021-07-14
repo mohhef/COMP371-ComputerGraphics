@@ -108,6 +108,10 @@ void Shader::unbind() const
 	GLCall(glUseProgram(0));
 }
 
+void Shader::setUniform1i(const std::string& name, int i) {
+	glUniform1i(getUniformLocation(name), i);
+}
+
 void Shader::setUniform4f(const std::string& name, float x, float y, float z, float w)
 {
 	glUniform4f(getUniformLocation(name), x, y, z, w);

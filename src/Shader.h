@@ -27,6 +27,7 @@ public:
 	void unbind() const;
 
 	unsigned int getUniformLocation(const std::string& name);
+	void setUniform1i(const std::string& name, int i);
 	void setUniform4f(const std::string& name,  float x, float y, float z, float w) ;
 	void setUniform4Vec(const std::string& name, glm::vec4 vec) ;
 	void setUniform4Mat(const std::string& name, glm::mat4 mat) ;
