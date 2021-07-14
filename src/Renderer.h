@@ -23,7 +23,7 @@ public:
 	// draw function should be used for Element Buffer Objects (indices)
 	void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
 	void drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection);
-	void drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> moddelRotMat, vector<glm::mat4> modelTransMat);
-	void drawWall(VertexArray & va, Shader & shader);
+	void drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> moddelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor);
+	void drawWall(VertexArray & va, Shader & shader, float scaleFactor);
 
 };

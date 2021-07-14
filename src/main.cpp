@@ -23,9 +23,9 @@
 
 using namespace std;
 
+float scaleFactor = 1.0f;
 // modified throughout run - to reset between runs - bound to a single model (modelIndex)
 vector<glm::mat4> modelTransMat;
-
 // modified throughout run - to reset between runs - bound to a single model (modelIndex)
 vector<glm::mat4> modelRotMat;
 Camera* camera = NULL;
@@ -229,8 +229,8 @@ int main(int argc, char* argv[])
 
 					
             // render wall
-            renderer.drawWall(vA, *shader);
-            renderer.drawObject(vA, *shader,  modelRotMat, modelTransMat);
+            renderer.drawWall(vA, *shader, scaleFactor);
+            renderer.drawObject(vA, *shader,  modelRotMat, modelTransMat, scaleFactor);
             renderer.drawAxes(vaAxes, *axesShader, view, projection);
 
             // End frame
