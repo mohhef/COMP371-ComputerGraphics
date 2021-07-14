@@ -99,7 +99,7 @@ void resetModel()
     scaleFactor = 1.0f;
 }
 
-void processInput(GLFWwindow* window)
+void processInput(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     // closes window
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -168,6 +168,19 @@ void processInput(GLFWwindow* window)
             modelRotMat.at(i) = model * modelRotMat.at(i);
         }
     }
+
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 }
 
 int main(int argc, char* argv[])
@@ -205,6 +218,7 @@ int main(int argc, char* argv[])
         // initialize model matricies for each cube within each model object
         resetTransMat();
         resetRotMat();
+        glfwSetKeyCallback(window, processInput);
 
         // Entering Main Loop
         while (!glfwWindowShouldClose(window))
@@ -241,10 +255,8 @@ int main(int argc, char* argv[])
 
             // Detect inputs
             glfwPollEvents();
-
-			// process input would go here
-			processInput(window);
         }
+
     }
 
     // Shutdown GLFW
