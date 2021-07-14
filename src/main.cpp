@@ -211,9 +211,6 @@ int main(int argc, char* argv[])
             deltaTime = currentFrame - lastFrame;
             lastFrame = currentFrame;
 
-            // process input would go here
-            processInput(window);
-
             renderer.clear();
 
 			shader->bind();
@@ -241,6 +238,9 @@ int main(int argc, char* argv[])
 
             // Detect inputs
             glfwPollEvents();
+
+			// process input would go here
+			processInput(window);
         }
     }
 
