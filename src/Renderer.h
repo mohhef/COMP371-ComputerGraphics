@@ -21,5 +21,6 @@ public:
 	void draw(const VertexArray& va, const Shader& shader) const;
 	// draw function should be used for Element Buffer Objects (indices)
 	void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+	void DrawAxes(VertexArray& va, Shader& shader);
 
 };

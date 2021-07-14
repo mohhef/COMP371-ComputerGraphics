@@ -86,6 +86,11 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f  
 };
 
+float axesVertices[] = {
+			0.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f
+};
+
 // initial configuration of cubes for wall
 vector<vector<glm::vec3>> wallCubePositions =
 {
@@ -374,17 +379,28 @@ int main(int argc, char* argv[])
     generateModelIndex();
     GLFWwindow* window = initializeWindow();
     {
-        VertexArray vA;
-        VertexBuffer vB(vertices, sizeof(vertices));
-        VertexBufferLayout layout;
+		// Setup for models
+			VertexArray vA;
+			VertexBuffer vB(vertices, sizeof(vertices));
+			VertexBufferLayout layout;
 
-        cout << sizeof(vertices) << endl;
-        cout << 6 * 6 * 3 * sizeof(float) << endl;
+			cout << sizeof(vertices) << endl;
+			cout << 6 * 6 * 3 * sizeof(float) << endl;
 
-        layout.push<float>(3);
-        vA.addBuffer(vB, layout);
+			layout.push<float>(3);
+			vA.addBuffer(vB, layout);
+        
+        // Setup for axes
+			VertexArray vaAxes;
+			VertexBuffer vbAxes(axesVertices, 3 * 2 * sizeof(float));
+			VertexBufferLayout layoutAxes;
+            layoutAxes.push<float>(3);
+            vaAxes.addBuffer(vbAxes, layoutAxes);
+        
 
         Shader* shader = new Shader("vertex_fragment.shader");
+        Shader* axesShader = new Shader("axes.shader");
+
         camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         Renderer renderer;
 
@@ -419,11 +435,39 @@ int main(int argc, char* argv[])
             glm::mat4 view = camera->getViewMatrix();
             shader->setUniform4Mat("view", view);
 
+			glm::mat4 model = glm::mat4(1.0f);
+					
             // render wall
             setWallModel(shader);
 
             // render model
             setObjectModel(shader);
+
+			axesShader->bind();
+			axesShader->setUniform4Mat("view", view);
+			axesShader->setUniform4Mat("projection", projection);
+			axesShader->setUniform4Mat("model", model);
+
+			vaAxes.bind();
+			vbAxes.bind();
+
+			axesShader->setUniform1i("xAxis", 1);
+			axesShader->setUniform4Vec("ourColor", glm::vec4(1.0, 0.0, 0.0, 1.0));
+			axesShader->setUniform4Mat("model", model);
+			renderer.DrawAxes(vaAxes, *axesShader);
+
+			model = glm::rotate(model, glm::radians(-85.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			axesShader->setUniform1i("yAxis", 1);
+			axesShader->setUniform4Vec("ourColor", glm::vec4(0.0, 1.0, 0.0, 1.0));
+			axesShader->setUniform4Mat("model", model);
+			renderer.DrawAxes(vaAxes, *axesShader);
+
+
+			model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			axesShader->setUniform1i("zAxis", 1);
+			axesShader->setUniform4Mat("model", model);
+			axesShader->setUniform4Vec("ourColor", glm::vec4(0.0, 0.0, 1.0, 1.0));
+			renderer.DrawAxes(vaAxes, *axesShader);
 
             vA.unbind();
             vB.unbind();
