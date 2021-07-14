@@ -11,6 +11,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 
 #include "Shader.h"
 #include "camera.h"
@@ -24,6 +26,7 @@
 using namespace std;
 
 float scaleFactor = 1.0f;
+
 // modified throughout run - to reset between runs - bound to a single model (modelIndex)
 vector<glm::mat4> modelTransMat;
 // modified throughout run - to reset between runs - bound to a single model (modelIndex)
