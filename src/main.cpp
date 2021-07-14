@@ -133,16 +133,18 @@ int main(int argc, char* argv[])
     {
 		Axes axes;
 
-		//float vertices[] = {
-	 //       0.0f, 0.0f, 0.0f,
-	 //       0.5f, 0.0f, 0.0f
-		//};
+		float axesVertices[] = {
+	        0.0f, 0.0f, 0.0f,
+	        1.0f, 0.0f, 0.0f
+		};
 
-		//VertexArray va;
-		//VertexBuffer vb(vertices, 3 * 2 * sizeof(float));
-		//VertexBufferLayout layout;
-		//layout.Push<float>(3);
-		//va.AddBuffer(vb, layout);
+		VertexArray va;
+		VertexBuffer vb(axesVertices, 3 * 2 * sizeof(float));
+	    VertexBufferLayout layout;
+		layout.Push<float>(3);
+		va.AddBuffer(vb, layout);
+        
+        
         //VertexArray va;
         //VertexBuffer vb(vertices, 6 * 6 * 3 * sizeof(float));
 		//VertexBufferLayout layout;
@@ -150,7 +152,8 @@ int main(int argc, char* argv[])
         //layout.Push<float>(3);
         //va.AddBuffer(vb, layout);
 
-        Shader shader("Basic.shader");
+        //Shader shader("Basic.shader");
+        Shader axesShader("Axes.shader");
         camera = new Camera(glm::vec3(0.0f, 0.0f, 10.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         Renderer renderer;
 
@@ -170,22 +173,41 @@ int main(int argc, char* argv[])
             processInput(window);
 
             renderer.Clear();
+			axesShader.Bind();
 
             //shader.setUniform4f("ourColor", 1, 0, 0, 1);
 
             // update projection matrix and pass to shader
             glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 100.0f);
-            shader.setUniform4Mat("projection", projection);
-
+            axesShader.setUniform4Mat("projection", projection);
             // update view matrix and pass to shader
             glm::mat4 view = camera->getViewMatrix();
-            shader.setUniform4Mat("view", view);
-
+            axesShader.setUniform4Mat("view", view);
             // calculate model matrix and pass to shader
-            glm::mat4 model = glm::mat4(1.0f);
-            shader.setUniform4Mat("model", model);
+			glm::mat4 model = glm::mat4(1.0f);
+            for (int i = 0; i < 3; i++) {
+                switch (i) {
+                case 0:
+                    axesShader.setUniform1i("xAxis", 1);
+                    axesShader.setUniform4Vec("ourColor", glm::vec4(1.0, 0.0, 0.0, 1.0));
+                    break;
 
-            renderer.DrawAxes(shader);
+                case 1:
+                    model = glm::rotate(model, glm::radians(-85.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                    axesShader.setUniform1i("yAxis", 1);
+                    axesShader.setUniform4Vec("ourColor", glm::vec4(0.0, 1.0, 0.0, 1.0));
+                    break;
+
+                case 2:
+                    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+                    axesShader.setUniform1i("zAxis", 1);
+					axesShader.setUniform4Vec("ourColor", glm::vec4(0.0, 0.0, 1.0, 1.0));
+                    break;
+                }
+				axesShader.setUniform4Mat("model", model);
+				renderer.DrawAxes(va, axesShader);
+            }
+			
             // now render triangles
 
             //glDrawArrays(GL_TRIANGLES, 0, 36);

@@ -40,9 +40,9 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 
 }
 
-void Renderer::DrawAxes(Shader& shader)
+void Renderer::DrawAxes(VertexArray& va,Shader& shader)
 {
-	shader.setUniform4f("ourColor", 1.0, 1.0, 0.0, 1.0);
+	va.Bind();
 	shader.Bind();
 	GLCall(glDrawArrays(GL_LINES, 0, 2));
 }

@@ -26,6 +26,7 @@ public:
 	void setUniform4f(const std::string& name,  float x, float y, float z, float w) ;
 	void setUniform4Vec(const std::string& name, glm::vec4 vec) ;
 	void setUniform4Mat(const std::string& name, glm::mat4 mat) ;
+	void setUniform1i(const std::string& name, int i);
 
 	unsigned int  CompileShader(unsigned int type, const std::string& source);
 	ShaderProgramSource ParseShader(const std::string& filepath);
