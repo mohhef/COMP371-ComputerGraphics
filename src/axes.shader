@@ -24,16 +24,5 @@ uniform int zAxis;
 
 void main()
 {
-	if (xAxis == 1)
-	{
-		FragColor = vec4(ourColor);
-	}
-	if (yAxis == 1)
-	{
-		FragColor = vec4(ourColor);
-	}
-	if (zAxis == 1)
-	{
-		FragColor = vec4(ourColor);
-	}
+	FragColor = vec4(ourColor);
 };
