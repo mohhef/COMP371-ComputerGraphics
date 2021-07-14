@@ -21,6 +21,18 @@ void Renderer::clear() const
 	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
+Renderer Renderer::s_Instance;
+Renderer::Renderer() {};
+
+Renderer& Renderer::getInstance()
+{
+	return s_Instance;
+}
+
+void Renderer::setRenderMethod(unsigned int method) {
+	renderMethod = method;
+}
+
 void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection)
 {
 	va.bind();
@@ -67,7 +79,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * transZ * initialPos * modelRotMat.at(i) * modelScale.at(modelIndex) * modelTransMat.at(i);
 
 		shader.setUniform4Mat("model", model);
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArrays(renderMethod, 0, 36);
 	}
 	va.unbind();
 	shader.unbind();
@@ -93,7 +105,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor) {
 
 		shader.setUniform4Mat("model", model);
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArrays(renderMethod, 0, 36);
 	}
 	va.unbind();
 	shader.unbind();
