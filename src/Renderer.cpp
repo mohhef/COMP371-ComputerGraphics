@@ -51,7 +51,7 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.unbind();
 }
 
-void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat) {
+void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor) {
 	va.bind();
 	shader.bind();
 
@@ -73,7 +73,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 	shader.unbind();
 }
 
-void Renderer::drawWall(VertexArray& va, Shader& shader) {
+void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor) {
 	va.bind();
 	shader.bind();
 

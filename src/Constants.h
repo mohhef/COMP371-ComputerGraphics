@@ -11,8 +11,6 @@ static float lastFrame = 0.0f;
 static float wallZPos = -10.0f;
 static int modelIndex = 0;
 
-static float scaleFactor = 1.0f;
-
 static const int HEIGHT = 768;
 static const int WIDTH = 1024;
 
