@@ -46,6 +46,9 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.setUniform4Mat("model", model);
 	shader.setUniform4Vec("ourColor", glm::vec4(0.0, 0.0, 1.0, 1.0));
 	GLCall(glDrawArrays(GL_LINES, 0, 2));
+
+	va.unbind();
+	shader.unbind();
 }
 
 void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat) {
@@ -66,6 +69,8 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 		shader.setUniform4Mat("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
+	va.unbind();
+	shader.unbind();
 }
 
 void Renderer::drawWall(VertexArray& va, Shader& shader) {
@@ -90,5 +95,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader) {
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
+	va.unbind();
+	shader.unbind();
 }
 
