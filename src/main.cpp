@@ -13,6 +13,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 
 #include "Shader.h"
 #include "camera.h"
@@ -32,7 +34,8 @@ const double pi = 3.14159265358979323846;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 float wallZPos = -10.0f;
-int modelIndex = 0;
+
+int modelIndex;
 
 float scaleFactor = 1.0f;
 
@@ -94,6 +97,15 @@ vector<vector<glm::vec3>> wallCubePositions =
         glm::vec3(-10.5f, 12.0f, wallZPos),
         glm::vec3(-6.0f, 15.0f, wallZPos)
     },
+    {
+        glm::vec3(0.0f, 0.3f, wallZPos),
+        glm::vec3(2.0f, 7.3f, wallZPos),
+        glm::vec3(6.4f, 6.3f, wallZPos),
+        glm::vec3(7.6f, 12.3f, wallZPos),
+        glm::vec3(-5.5f, 11.3f, wallZPos),
+        glm::vec3(2.0f, 15.45f, wallZPos),
+        glm::vec3(4.0f, 10.5f, wallZPos),
+    },
 };
 
 // initial configuration scale of wall cubes
@@ -106,6 +118,15 @@ vector<vector<glm::vec3>> wallScales =
         glm::vec3(2.0f, 2.0f, 2.0f),
         glm::vec3(3.0f, 9.0f, 2.0f),
         glm::vec3(6.0f, 3.0f, 2.0f)
+    },
+    {
+        glm::vec3(20.0f, 10.0f, 1.0f),
+        glm::vec3(1.8f, 4.0f, 1.0f),
+        glm::vec3(7.2f, 2.0f, 1.0f),
+        glm::vec3(4.8f, 10.0f, 1.0f),
+        glm::vec3(9.0f, 12.0f, 1.0f),
+        glm::vec3(6.0f, 3.7f, 1.0f),
+        glm::vec3(2.0f, 2.0f, 1.0f),
     },
 };
 
@@ -129,11 +150,25 @@ vector<vector<glm::vec3>> modelCubePositions =
         glm::vec3(0.0f, 0.0f, -1.0f),
         glm::vec3(0.0f, 0.0f, -2.0f),
     },
+    {
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, 1.0f),
+        glm::vec3(1.0f, 1.0f, 0.0f),
+        glm::vec3(2.0f, 2.0f, 0.0f),
+        glm::vec3(3.0f, 0.0f, 0.0f),
+        glm::vec3(2.0f, 0.0f, 0.0f),
+        glm::vec3(1.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 2.0f, 2.0f),
+        glm::vec3(0.0f, 1.0f, 2.0f),
+        glm::vec3(0.0f, 2.0f, 1.0f),
+    },
 };
 
 // initial configuration scale of model cubes
 vector<glm::mat4> modelScale
 {
+    glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
     glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
 };
 
@@ -141,6 +176,7 @@ vector<glm::mat4> modelScale
 vector<glm::vec3> modelPosition =
 {
     glm::vec3(-8.0f, 27.5f, 20.0f),
+    glm::vec3(0.0f, 27.5f, 20.0f)
 };
 
 // modified throughout run - to reset between runs - bound to a single model (modelIndex)
@@ -192,6 +228,7 @@ void setObjectModel(Shader* shader)
     float time = (float)glfwGetTime();
     for (int i = 0; i < numCubePieces; i++)
     {
+        
         glm::mat4 transZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -(float)glfwGetTime()));
         glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(modelIndex));
         
@@ -211,12 +248,12 @@ void setWallModel(Shader* shader)
     {
         // calculate model matrix for each object and pass it to shader before drawing
         glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(modelIndex));
-    
+
         // unit matrix * wall_scale * wall_translation (align with XZ plane) * wall_cube_scale * wall_cube_translate
         glm::mat4 model = glm::mat4(1.0f)
             * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor))
             * initialPos
-            * glm::translate(glm::mat4(1.0f), wallCubePositions.at(modelIndex).at(i)) 
+            * glm::translate(glm::mat4(1.0f), wallCubePositions.at(modelIndex).at(i))
             * glm::scale(glm::mat4(1.0f), wallScales.at(modelIndex).at(i));
 
         shader->setUniform4Mat("model", model);
@@ -326,8 +363,14 @@ void processInput(GLFWwindow* window)
     }
 }
 
+void generateModelIndex() {
+    srand(time(NULL));
+    modelIndex = rand() % 2;
+}
+
 int main(int argc, char* argv[])
 {
+    generateModelIndex();
     GLFWwindow* window = initializeWindow();
     {
         VertexArray vA;
