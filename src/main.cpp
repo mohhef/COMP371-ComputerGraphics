@@ -134,6 +134,7 @@ vector<vector<glm::vec3>> wallScales =
 vector<glm::vec3> wallPosition =
 {
     glm::vec3(0.0f, 15.0f, 0.0f),
+    glm::vec3(0.0f, 15.0f, 0.0f),
 };
 
 // initial configuration of cubes for model
