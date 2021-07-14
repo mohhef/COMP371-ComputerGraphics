@@ -2,7 +2,6 @@
 #include<GL/glew.h>
 #include "VertexArray.h"
 #include "IndexBuffer.h"
-#include <vector>
 #include "Shader.h"
 #include "Constants.h"
 
