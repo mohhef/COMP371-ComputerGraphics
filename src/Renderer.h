@@ -32,4 +32,5 @@ public:
 	void drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection);
 	void drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> moddelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor);
 	void drawWall(VertexArray & va, Shader & shader, float scaleFactor);
+	void drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, float scaleFactor);
 };
