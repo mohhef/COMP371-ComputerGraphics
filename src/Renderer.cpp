@@ -7,7 +7,8 @@ void glClearError()
 	while (glGetError() != GL_NO_ERROR);
 }
 
-bool glLogCall(const char* function, const char* file, int line) {
+bool glLogCall(const char* function, const char* file, int line) 
+{
 	while (GLenum error = glGetError()) {
 		std::cout << "[OpenGL Error] (" << error << ")" << function << " " <<
 			" " << file << " " << line << std::endl;
@@ -39,7 +40,7 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	va.bind();
 	shader.bind();
 
-	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(5));
 
 	shader.setUniform4Mat("view", view);
 	shader.setUniform4Mat("projection", projection);
@@ -53,7 +54,6 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.setUniform4Vec("ourColor", glm::vec4(0.0, 1.0, 0.0, 1.0));
 	shader.setUniform4Mat("model", model);
 	GLCall(glDrawArrays(GL_LINES, 0, 2));
-
 
 	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	shader.setUniform4Mat("model", model);
@@ -96,7 +96,8 @@ void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.unbind();
 }
 
-void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement) {
+void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement) 
+{
 	va.bind();
 	shader.bind();
 
@@ -114,11 +115,13 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 		shader.setUniform4Mat("model", model);
 		glDrawArrays(renderMethod, 0, 36);
 	}
+  
 	va.unbind();
 	shader.unbind();
 }
 
-void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor, glm::vec3 displacement) {
+void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor, glm::vec3 displacement) 
+{
 	va.bind();
 	shader.bind();
 
@@ -142,6 +145,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor, glm:
 
 		glDrawArrays(renderMethod, 0, 36);
 	}
+  
 	va.unbind();
 	shader.unbind();
 }

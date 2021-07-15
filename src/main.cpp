@@ -250,7 +250,7 @@ int main(int argc, char* argv[])
 		VertexArray vA;
 		VertexBuffer vB(vertices, sizeof(vertices));
 		VertexBufferLayout layout;
-
+    
 		layout.push<float>(3);
 		vA.addBuffer(vB, layout);
 
@@ -295,7 +295,7 @@ int main(int argc, char* argv[])
 			lastFrame = currentFrame;
 
 			renderer.clear();
-
+      
 			shader->bind();
 			vA.bind();
 			vB.bind();
@@ -309,7 +309,6 @@ int main(int argc, char* argv[])
 			// update view matrix and pass to shader
 			glm::mat4 view = camera->getViewMatrix();
 			shader->setUniform4Mat("view", view);
-
 
 			// render 
 			renderer.drawWall(vA, *shader, scaleFactor, displacement);

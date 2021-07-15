@@ -9,7 +9,7 @@ static const double pi = 3.14159265358979323846;
 static float deltaTime = 0.0f;
 static float lastFrame = 0.0f;
 static float wallZPos = -10.0f;
-static int modelIndex = 0;
+static int modelIndex = 1;
 
 static const int HEIGHT = 768;
 static const int WIDTH = 1024;
