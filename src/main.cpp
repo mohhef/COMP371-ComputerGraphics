@@ -188,26 +188,34 @@ int main(int argc, char* argv[])
     GLFWwindow* window = initializeWindow();
     {
 		// Setup for models
-			VertexArray vA;
-			VertexBuffer vB(vertices, sizeof(vertices));
-			VertexBufferLayout layout;
+		VertexArray vA;
+		VertexBuffer vB(vertices, sizeof(vertices));
+		VertexBufferLayout layout;
 
-			cout << sizeof(vertices) << endl;
-			cout << 6 * 6 * 3 * sizeof(float) << endl;
+		cout << sizeof(vertices) << endl;
+		cout << 6 * 6 * 3 * sizeof(float) << endl;
 
-			layout.push<float>(3);
-			vA.addBuffer(vB, layout);
+		layout.push<float>(3);
+		vA.addBuffer(vB, layout);
         
         // Setup for axes
-			VertexArray vaAxes;
-			VertexBuffer vbAxes(axesVertices, 3 * 2 * sizeof(float));
-			VertexBufferLayout layoutAxes;
-            layoutAxes.push<float>(3);
-            vaAxes.addBuffer(vbAxes, layoutAxes);
+		VertexArray vaAxes;
+		VertexBuffer vbAxes(axesVertices, 3 * 2 * sizeof(float));
+		VertexBufferLayout layoutAxes;
+        layoutAxes.push<float>(3);
+        vaAxes.addBuffer(vbAxes, layoutAxes);
+
+        // Setup for mesh
+        VertexArray vaMesh;
+        VertexBuffer vbMesh(meshVertices, 3 * 2 * sizeof(float));
+        VertexBufferLayout layoutMesh;
+        layoutMesh.push<float>(3);
+        vaMesh.addBuffer(vbMesh, layoutMesh);
         
 
         Shader* shader = new Shader("vertex_fragment.shader");
         Shader* axesShader = new Shader("axes.shader");
+        Shader* meshShader = new Shader("vertex_fragment.shader");
 
         camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         Renderer& renderer = Renderer::getInstance();
@@ -249,6 +257,7 @@ int main(int argc, char* argv[])
             renderer.drawWall(vA, *shader, scaleFactor);
             renderer.drawObject(vA, *shader,  modelRotMat, modelTransMat, scaleFactor);
             renderer.drawAxes(vaAxes, *axesShader, view, projection);
+            renderer.drawMesh(vaMesh, *meshShader, view,  projection, scaleFactor);
 
             // End frame
             glfwSwapBuffers(window);

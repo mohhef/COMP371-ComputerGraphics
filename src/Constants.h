@@ -63,6 +63,11 @@ static float axesVertices[] = {
 			1.0f, 0.0f, 0.0f
 };
 
+static float meshVertices[] = {
+	0.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f
+};
+
 // initial configuration of cubes for wall
 static  vector<vector<glm::vec3>> wallCubePositions =
 {
