@@ -48,18 +48,15 @@ void Camera::tiltCamera(float yOffset)
 {
 	yOffset *= mouseSensitivity;
 
-	front = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(yOffset), glm::vec3(1.0f, 0.0f, 0.0f))) * front;
-	up = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(yOffset), glm::vec3(1.0f, 0.0f, 0.0f))) * up;
-	right = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(yOffset), glm::vec3(1.0f, 0.0f, 0.0f))) * right;
+	front = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(yOffset), right)) * front;
+	up = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(yOffset), right)) * up;
 }
 
 void Camera::panCamera(float xOffset)
 {
 	xOffset *= mouseSensitivity;
-
-	front = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f))) * front;
-	up = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f))) * up;
-	right = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(xOffset), glm::vec3(0.0f, 1.0f, 0.0f))) * right;
+	front = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(xOffset), up)) * front;
+	right = glm::mat3(glm::rotate(glm::mat4(1.0f), glm::radians(xOffset), up)) * right;
 }
 
 void Camera::zoomCamera(float yOffset)
