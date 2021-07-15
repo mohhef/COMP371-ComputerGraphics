@@ -29,7 +29,8 @@ Renderer& Renderer::getInstance()
 	return s_Instance;
 }
 
-void Renderer::setRenderMethod(unsigned int method) {
+void Renderer::setRenderMethod(unsigned int method) 
+{
 	renderMethod = method;
 }
 
@@ -63,7 +64,7 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.unbind();
 }
 
-void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor) {
+void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement) {
 	va.bind();
 	shader.bind();
 
@@ -72,11 +73,11 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 	float time = (float)glfwGetTime();
 	for (int i = 0; i < numCubePieces; i++)
 	{
-		glm::mat4 transZ = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -(float)glfwGetTime()));
+		glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(displacement.x, 0.0f, displacement.z));
 		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(modelIndex));
 
-		// unit matrix * scaling input * z_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
-		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * transZ * initialPos * modelRotMat.at(i) * modelScale.at(modelIndex) * modelTransMat.at(i);
+		// unit matrix * scaling input * xz_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
+		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i) * modelScale.at(modelIndex) * modelTransMat.at(i);
 
 		shader.setUniform4Mat("model", model);
 		glDrawArrays(renderMethod, 0, 36);
@@ -85,7 +86,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 	shader.unbind();
 }
 
-void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor) {
+void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor, glm::vec3 displacement) {
 	va.bind();
 	shader.bind();
 
@@ -94,11 +95,13 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor) {
 	for (int i = 0; i < numWallPieces; i++)
 	{
 		// calculate model matrix for each object and pass it to shader before drawing
+		glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(displacement.x, 0.0f, 0.0f));
 		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(modelIndex));
 
-		// unit matrix * wall_scale * wall_translation (align with XZ plane) * wall_cube_scale * wall_cube_translate
+		// unit matrix * wall_scale * x_translation * wall_translation (align with XZ plane) * wall_cube_scale * wall_cube_translate
 		glm::mat4 model = glm::mat4(1.0f)
 			* glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor))
+			* trans
 			* initialPos
 			* glm::translate(glm::mat4(1.0f), wallCubePositions.at(modelIndex).at(i))
 			* glm::scale(glm::mat4(1.0f), wallScales.at(modelIndex).at(i));

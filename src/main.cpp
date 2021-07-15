@@ -25,12 +25,15 @@
 
 using namespace std;
 
+// modified throughout run - to reset between runs - possible bound to a single model (modelIndex) - to reset between models
+vector<glm::mat4> modelTransMat;
+vector<glm::mat4> modelRotMat;
+glm::vec3 displacement;
 float scaleFactor = 1.0f;
 
-// modified throughout run - to reset between runs - bound to a single model (modelIndex)
-vector<glm::mat4> modelTransMat;
-// modified throughout run - to reset between runs - bound to a single model (modelIndex)
-vector<glm::mat4> modelRotMat;
+float lastMouseX;
+float lastMouseY;
+
 Camera* camera = NULL;
 
 GLFWwindow* initializeWindow()
@@ -85,9 +88,7 @@ void resetRotMat()
     modelRotMat.resize(modelCubePositions.at(modelIndex).size());
     for (int i = 0; i < modelCubePositions.at(modelIndex).size(); i++)
     {
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        modelRotMat.at(i) = model;
+        modelRotMat.at(i) = glm::mat4(1.0f);
     }
 }
 
@@ -96,10 +97,11 @@ void resetModel()
     resetTransMat();
     resetRotMat();
     glfwSetTime(0.0f);
+    displacement = glm::vec3();
     scaleFactor = 1.0f;
 }
 
-void processInput(GLFWwindow* window, int key, int scancode, int action, int mods)
+void processInput(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     // closes window
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -117,7 +119,9 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 
     // reset model
     if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
-        resetModel();
+        camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f));
 
     // scale model
     if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
@@ -134,38 +138,70 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
     // rotate model
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        for (int i = 0; i < modelRotMat.size(); i++)
+        if (mode == GLFW_MOD_SHIFT)
         {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::rotate(model, glm::radians(5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            modelRotMat.at(i) = model * modelRotMat.at(i);
+            if (displacement.z != -100.f)
+                displacement.z -= 0.50f;
+        }
+        else
+        {
+            for (int i = 0; i < modelRotMat.size(); i++)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::rotate(model, glm::radians(5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+                modelRotMat.at(i) = model * modelRotMat.at(i);
+            }
         }
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        for (int i = 0; i < modelRotMat.size(); i++)
+        if (mode == GLFW_MOD_SHIFT)
         {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::rotate(model, glm::radians(-5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            modelRotMat.at(i) = model * modelRotMat.at(i);
+            if (displacement.z != 20.f)
+                displacement.z += 0.50f;
+        }
+        else
+        {
+            for (int i = 0; i < modelRotMat.size(); i++)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::rotate(model, glm::radians(-5.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+                modelRotMat.at(i) = model * modelRotMat.at(i);
+            }
         }
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        for (int i = 0; i < modelRotMat.size(); i++)
+        if (mode == GLFW_MOD_SHIFT)
         {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::rotate(model, glm::radians(5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            modelRotMat.at(i) = model * modelRotMat.at(i);
+            if (displacement.x != -20.f)
+                displacement.x -= 0.50f;
+        }
+        else
+        {
+            for (int i = 0; i < modelRotMat.size(); i++)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::rotate(model, glm::radians(5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                modelRotMat.at(i) = model * modelRotMat.at(i);
+            }
         }
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        for (int i = 0; i < modelRotMat.size(); i++)
+        if (mode == GLFW_MOD_SHIFT)
         {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::rotate(model, glm::radians(-5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            modelRotMat.at(i) = model * modelRotMat.at(i);
+            if (displacement.x != 20.f)
+                displacement.x += 0.50f;
+        }
+        else
+        {
+            for (int i = 0; i < modelRotMat.size(); i++)
+            {
+                glm::mat4 model = glm::mat4(1.0f);
+                model = glm::rotate(model, glm::radians(-5.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+                modelRotMat.at(i) = model * modelRotMat.at(i);
+            }
         }
     }
 
@@ -183,42 +219,93 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
     }
 }
 
+void processMouse(GLFWwindow* window, double xpos, double  ypos)
+{
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE
+        && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE
+        && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_RELEASE)
+    {
+        initialMousePos = true;
+        return;
+    }
+
+    if (initialMousePos)
+    {
+        lastMouseX = xpos;
+        lastMouseY = ypos;
+        initialMousePos = false;
+    }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+    {
+        float yOffset = lastMouseY - ypos;
+
+        lastMouseX = xpos;
+        lastMouseY = ypos;
+
+        camera->zoomCamera(yOffset);
+    }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+    {
+        float xOffset = lastMouseX - xpos;
+
+        lastMouseX = xpos;
+        lastMouseY = ypos;
+
+        camera->panCamera(xOffset);
+    }
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
+    {
+        float yOffset = lastMouseY - ypos;
+
+        lastMouseX = xpos;
+        lastMouseY = ypos;
+
+        camera->tiltCamera(yOffset);
+    }
+}
+
 int main(int argc, char* argv[])
 {
     GLFWwindow* window = initializeWindow();
     {
 		// Setup for models
-			VertexArray vA;
-			VertexBuffer vB(vertices, sizeof(vertices));
-			VertexBufferLayout layout;
+		VertexArray vA;
+		VertexBuffer vB(vertices, sizeof(vertices));
+		VertexBufferLayout layout;
 
-			cout << sizeof(vertices) << endl;
-			cout << 6 * 6 * 3 * sizeof(float) << endl;
+		cout << sizeof(vertices) << endl;
+		cout << 6 * 6 * 3 * sizeof(float) << endl;
 
-			layout.push<float>(3);
-			vA.addBuffer(vB, layout);
+		layout.push<float>(3);
+		vA.addBuffer(vB, layout);
         
         // Setup for axes
-			VertexArray vaAxes;
-			VertexBuffer vbAxes(axesVertices, 3 * 2 * sizeof(float));
-			VertexBufferLayout layoutAxes;
-            layoutAxes.push<float>(3);
-            vaAxes.addBuffer(vbAxes, layoutAxes);
+		VertexArray vaAxes;
+		VertexBuffer vbAxes(axesVertices, 3 * 2 * sizeof(float));
+		VertexBufferLayout layoutAxes;
+        layoutAxes.push<float>(3);
+        vaAxes.addBuffer(vbAxes, layoutAxes);
         
 
         Shader* shader = new Shader("vertex_fragment.shader");
         Shader* axesShader = new Shader("axes.shader");
 
-        camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
+            glm::vec3(0.0f, 1.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f));
+
         Renderer& renderer = Renderer::getInstance();
 
         glEnable(GL_DEPTH_TEST);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-        // initialize model matricies for each cube within each model object
-        resetTransMat();
-        resetRotMat();
+        // initialize model matricies for each cube within each model 
+        resetModel();
         glfwSetKeyCallback(window, processInput);
+        glfwSetCursorPosCallback(window, processMouse);
 
         // Entering Main Loop
         while (!glfwWindowShouldClose(window))
@@ -246,8 +333,8 @@ int main(int argc, char* argv[])
 
 					
             // render wall
-            renderer.drawWall(vA, *shader, scaleFactor);
-            renderer.drawObject(vA, *shader,  modelRotMat, modelTransMat, scaleFactor);
+            renderer.drawWall(vA, *shader, scaleFactor, displacement);
+            renderer.drawObject(vA, *shader,  modelRotMat, modelTransMat, scaleFactor, displacement);
             renderer.drawAxes(vaAxes, *axesShader, view, projection);
 
             // End frame

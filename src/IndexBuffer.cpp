@@ -27,5 +27,5 @@ void IndexBuffer::unbind() const
 
 unsigned int IndexBuffer::getCount() const
 {
-	return count; 
+	return count;
 }

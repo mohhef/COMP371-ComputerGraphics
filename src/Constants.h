@@ -9,10 +9,16 @@ static const double pi = 3.14159265358979323846;
 static float deltaTime = 0.0f;
 static float lastFrame = 0.0f;
 static float wallZPos = -10.0f;
-static int modelIndex = 1;
+static int modelIndex = 0;
 
 static const int HEIGHT = 768;
 static const int WIDTH = 1024;
+
+static float lastX = WIDTH / 2;
+static float lastY = HEIGHT / 2;
+static float pitch = 0.0f;
+static float yaw = -90.0f;
+static bool initialMousePos = true;
 
 static float vertices[] = {
 	-0.5f, -0.5f, -0.5f,
@@ -110,7 +116,7 @@ static vector<vector<glm::vec3>> wallScales =
 // initial configuration position of wall (to align with XZ plane)
 static vector<glm::vec3> wallPosition =
 {
-	glm::vec3(0.0f, 15.0f, 0.0f),
+	glm::vec3(0.0f, 7.5f, 0.0f),
 	glm::vec3(0.0f, 15.0f, 0.0f),
 };
 
@@ -153,7 +159,7 @@ static vector<glm::mat4> modelScale
 // initial configuration position of model (to align with hole)
 static vector<glm::vec3> modelPosition =
 {
-	glm::vec3(-8.0f, 27.5f, 20.0f),
+	glm::vec3(-8.0f, 20.0f, 20.0f),
 	glm::vec3(0.0f, 27.5f, 20.0f)
 };
 
