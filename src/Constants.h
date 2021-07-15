@@ -20,7 +20,8 @@ static float pitch = 0.0f;
 static float yaw = -90.0f;
 static bool initialMousePos = true;
 
-static float vertices[] = {
+static float vertices[] =
+{
 	-0.5f, -0.5f, -0.5f,
 	0.5f, -0.5f, -0.5f,
 	0.5f,  0.5f, -0.5f,
@@ -64,9 +65,10 @@ static float vertices[] = {
 	-0.5f,  0.5f, -0.5f
 };
 
-static float axesVertices[] = {
-			0.0f, 0.0f, 0.0f,
-			1.0f, 0.0f, 0.0f
+static float axesVertices[] =
+{
+	0.0f, 0.0f, 0.0f,
+	1.0f, 0.0f, 0.0f
 };
 
 // initial configuration of cubes for wall
@@ -162,4 +164,3 @@ static vector<glm::vec3> modelPosition =
 	glm::vec3(-8.0f, 20.0f, 20.0f),
 	glm::vec3(0.0f, 27.5f, 20.0f)
 };
-

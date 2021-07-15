@@ -1,6 +1,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "camera.h"
+#include "Camera.h"
 #include <iostream>
 using namespace std;
 
