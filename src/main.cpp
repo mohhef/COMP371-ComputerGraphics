@@ -59,7 +59,6 @@ GLFWwindow* initializeWindow()
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
 
-
 	// Initialize GLEW
 	if (glewInit() != GLEW_OK) {
 		cerr << "Failed to create GLEW" << endl;
@@ -87,9 +86,7 @@ void resetRotMat()
 {
 	modelRotMat.resize(modelCubePositions.at(modelIndex).size());
 	for (int i = 0; i < modelCubePositions.at(modelIndex).size(); i++)
-	{
 		modelRotMat.at(i) = glm::mat4(1.0f);
-	}
 }
 
 void resetModel()
@@ -117,7 +114,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		camera->processMovement(KEY::RIGHT, deltaTime);
 
-	// reset model
+	// reset camera
 	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),
@@ -264,9 +261,16 @@ int main(int argc, char* argv[])
 		layoutAxes.push<float>(3);
 		vaAxes.addBuffer(vbAxes, layoutAxes);
 
+		// Setup for mesh
+		VertexArray vaMesh;
+		VertexBuffer vbMesh(meshVertices, 3 * 2 * sizeof(float));
+		VertexBufferLayout layoutMesh;
+		layoutMesh.push<float>(3);
+		vaMesh.addBuffer(vbMesh, layoutMesh);
 
 		Shader* shader = new Shader("vertex_fragment.shader");
 		Shader* axesShader = new Shader("axes.shader");
+		Shader* meshShader = new Shader("vertex_fragment.shader");
 
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),
@@ -307,10 +311,11 @@ int main(int argc, char* argv[])
 			shader->setUniform4Mat("view", view);
 
 
-			// render wall
+			// render 
 			renderer.drawWall(vA, *shader, scaleFactor, displacement);
 			renderer.drawObject(vA, *shader, modelRotMat, modelTransMat, scaleFactor, displacement);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
+			renderer.drawMesh(vaMesh, *meshShader, view, projection, scaleFactor);
 
 			// End frame
 			glfwSwapBuffers(window);

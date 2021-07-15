@@ -64,6 +64,38 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.unbind();
 }
 
+void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, float scaleFactor)
+{
+	va.bind();
+	shader.bind();
+
+	shader.setUniform4Mat("view", view);
+	shader.setUniform4Mat("projection", projection);
+	shader.setUniform4Vec("ourColor", glm::vec4(0.5, 0.5, 0.5, 0.0f));
+
+	glm::mat4 model;
+	glm::mat4 model2;
+
+	for (float current = -50.0f; current <= 50.0f; current += 1.0f) {
+
+		// center line * scaling
+		model = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, 0.0f, current))
+			* glm::scale(glm::mat4(1.0f), glm::vec3(100));
+		shader.setUniform4Mat("model", model);
+		GLCall(glDrawArrays(GL_LINES, 0, 2));
+
+		// rotate line * center line * scaling
+		model2 = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f))
+			* glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, 0.0f, current))
+			* glm::scale(glm::mat4(1.0f), glm::vec3(100));
+		shader.setUniform4Mat("model", model2);
+		GLCall(glDrawArrays(GL_LINES, 0, 2));
+	}
+
+	va.unbind();
+	shader.unbind();
+}
+
 void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement) {
 	va.bind();
 	shader.bind();
