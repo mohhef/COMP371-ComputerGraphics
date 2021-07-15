@@ -115,10 +115,10 @@ static vector<vector<glm::vec3>> wallScales =
 		glm::vec3(6.0f, 3.0f, 2.0f)
 	},
 	{
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 1.0f),
+		glm::vec3(20.0f, 10.0f, 1.0f),
+		glm::vec3(1.8f, 4.0f, 1.0f),
+		glm::vec3(7.2f, 2.0f, 1.0f),
+		glm::vec3(4.8f, 10.0f, 1.0f),
 		glm::vec3(9.0f, 12.0f, 1.0f),
 		glm::vec3(6.0f, 3.7f, 1.0f),
 		glm::vec3(2.0f, 2.0f, 1.0f),
