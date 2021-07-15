@@ -271,21 +271,18 @@ int main(int argc, char* argv[])
 {
     GLFWwindow* window = initializeWindow();
     {
-		// Setup for models
-		VertexArray vA;
-		VertexBuffer vB(vertices, sizeof(vertices));
-		VertexBufferLayout layout;
+        // Setup for models
+        VertexArray vA;
+        VertexBuffer vB(vertices, sizeof(vertices));
+        VertexBufferLayout layout;
 
-		cout << sizeof(vertices) << endl;
-		cout << 6 * 6 * 3 * sizeof(float) << endl;
-
-		layout.push<float>(3);
-		vA.addBuffer(vB, layout);
+        layout.push<float>(3);
+        vA.addBuffer(vB, layout);
         
         // Setup for axes
-		VertexArray vaAxes;
-		VertexBuffer vbAxes(axesVertices, 3 * 2 * sizeof(float));
-		VertexBufferLayout layoutAxes;
+        VertexArray vaAxes;
+        VertexBuffer vbAxes(axesVertices, 3 * 2 * sizeof(float));
+        VertexBufferLayout layoutAxes;
         layoutAxes.push<float>(3);
         vaAxes.addBuffer(vbAxes, layoutAxes);
         
