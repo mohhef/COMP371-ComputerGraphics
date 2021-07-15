@@ -13,7 +13,7 @@ class Camera
 public:
 	const float DEFAULT_YAW = -90.0f;
 	const float DEFAULT_PITCH = 0.0f;
-	const float DEFAULT_SPEED = 0.05f;
+	const float DEFAULT_ROTATION_SPEED = 30.0f;
 	const float DEFAULT_SENSITIVITY = 0.1f;
 	const float DEFAULT_ZOOM = 45.0f; // FOV
 
@@ -24,9 +24,6 @@ public:
 	glm::vec3 worldUp;
 	glm::vec3 target;
 
-	float yaw;
-	float pitch;
-
 	float cameraSpeed;
 	float mouseSensitivity;
 	float zoom;
@@ -34,11 +31,12 @@ public:
 	Camera(glm::vec3 position, glm::vec3 worldUp, glm::vec3 target);
 
 	void processMovement(KEY key, float deltaTime);
-	
+	void tiltCamera(float yOffset);
+	void panCamera(float xOffset);
+	void zoomCamera(float yOffset);
+
 	glm::mat4 getViewMatrix();
 
 private:
-	void updateCameraVectors();
-	void rotateGlobalY(float factor);
-	void rotateGlobalX(float factor);
+	void rotateCameraGlobal(float factor, glm::vec3 axis);
 };
