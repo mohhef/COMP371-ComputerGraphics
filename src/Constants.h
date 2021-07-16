@@ -202,20 +202,3 @@ static vector<glm::vec3> modelPosition =
 		glm::vec3(-8.0f, 20.0f, 10.0f),
 		glm::vec3(0.0f, 27.5f, 10.0f)
 };
-
-	//{
-	//glm::vec3(0.0f, 5.0f, 20.0f),
-	//	glm::vec3(-20.0f, 5.0f, -20.0f),
-	//	glm::vec3(20.0f, 5.0f, -20.0f),
-	//},
-	//{
-	//	glm::vec3(0.0f,0.0f,0.0f),
-	//	glm::vec3(-8.0f, 20.0f, 20.0f),
-	//	glm::vec3(0.0f,0.0f,0.0f)
-	//},
-	//{
-	//	glm::vec3(0.0f,0.0f,0.0f),
-	//	glm::vec3(0.0f,0.0f,0.0f),
-	//	glm::vec3(0.0f, 27.5f, 20.0f)
-	//},
-	//{
