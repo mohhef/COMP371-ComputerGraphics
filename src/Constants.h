@@ -143,7 +143,7 @@ static vector<glm::vec3> wallPosition =
 {
 	glm::vec3(0.0f, 1.0f, 10.0f),
 	glm::vec3(0.0f, 7.5f, 10.0f),
-	glm::vec3(0.0f, 15.0f, 10.0f),
+	glm::vec3(0.0f, 4.7f, 10.0f),
 };
 
 // initial configuration of cubes for model
@@ -200,5 +200,5 @@ static vector<glm::vec3> modelPosition =
 
 		glm::vec3(0.0f, 5.0f, 10.0f),
 		glm::vec3(-8.0f, 20.0f, 10.0f),
-		glm::vec3(0.0f, 27.5f, 10.0f)
+		glm::vec3(0.0f, 17.2f, 10.0f)
 };
