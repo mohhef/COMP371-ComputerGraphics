@@ -47,7 +47,6 @@ GLFWwindow* initializeWindow()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GL_DEPTH_BITS, 24);
 
 	// Create Window and rendering context using GLFW, resolution is WIDTH x HEIGHT
 	window = glfwCreateWindow(WIDTH, HEIGHT, "playground", NULL, NULL);
@@ -105,23 +104,6 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
-	if (key == GLFW_KEY_1 || key == GLFW_KEY_2 || key == GLFW_KEY_3) {
-		if (key == GLFW_KEY_1) {
-			modelIndex = 0;
-			Renderer::getInstance().setRenderIndex(modelIndex);
-		}
-		if (key == GLFW_KEY_2) {
-			modelIndex = 1;
-			Renderer::getInstance().setRenderIndex(modelIndex);
-		}
-		if (key == GLFW_KEY_3) {
-			modelIndex = 2;
-			Renderer::getInstance().setRenderIndex(modelIndex);
-		}
-		resetModel();
-		camera->position = glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f);
-	}
-	
 	// rotate of camera around world
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		camera->processMovement(KEY::UP, deltaTime);
@@ -290,20 +272,14 @@ int main(int argc, char* argv[])
 		Shader* axesShader = new Shader("axes.shader");
 		Shader* meshShader = new Shader("vertex_fragment.shader");
 
-
-
-		Renderer& renderer = Renderer::getInstance();
-
-
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
-
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, 0.0f));
+
+		Renderer& renderer = Renderer::getInstance();
+
+		glEnable(GL_DEPTH_TEST);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		// initialize model matricies for each cube within each model 
 		resetModel();
@@ -313,7 +289,6 @@ int main(int argc, char* argv[])
 		// Entering Main Loop
 		while (!glfwWindowShouldClose(window))
 		{
-
 			// update last frame
 			float currentFrame = glfwGetTime();
 			deltaTime = currentFrame - lastFrame;
@@ -338,12 +313,12 @@ int main(int argc, char* argv[])
 			// render 
 			renderer.drawWall(vA, *shader, scaleFactor, displacement);
 			renderer.drawObject(vA, *shader, modelRotMat, modelTransMat, scaleFactor, displacement);
-			renderer.drawStaticObjects(vA, *shader);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
 			renderer.drawMesh(vaMesh, *meshShader, view, projection, scaleFactor);
 
 			// End frame
 			glfwSwapBuffers(window);
+
 			// Detect inputs
 			glfwPollEvents();
 		}
