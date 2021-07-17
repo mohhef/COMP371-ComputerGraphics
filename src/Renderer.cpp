@@ -99,6 +99,7 @@ void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	va.unbind();
 	shader.unbind();
 }
+
 void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
 	va.bind();
 	shader.bind();
@@ -146,6 +147,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
 		corner = transRightCorner;
 	}
 }
+
 void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement) 
 {
 	va.bind();

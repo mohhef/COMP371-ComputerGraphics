@@ -1,7 +1,6 @@
 #pragma once
 #include <GL/glew.h>
 #include "VertexArray.h"
-#include "IndexBuffer.h"
 #include "Shader.h"
 #include "Constants.h"
 
@@ -30,8 +29,7 @@ public:
 	void clear() const;
 	void draw(const VertexArray& va, const Shader& shader) const;
 
-	// draw function should be used for Element Buffer Objects (indices)
-	void draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+	// draw functions
 	void drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection);
 	void drawStaticObjects(VertexArray& va, Shader& shader);
 	void drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> moddelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement);

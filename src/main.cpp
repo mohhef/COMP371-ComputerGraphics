@@ -18,7 +18,6 @@
 #include "Camera.h"
 
 #include "VertexBuffer.h"
-#include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
 #include "Constants.h"
@@ -119,7 +118,9 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 			Renderer::getInstance().setRenderIndex(modelIndex);
 		}
 		resetModel();
-		camera->position = glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f);
+		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 0.0f, 0.0f));
 	}
 	
 	// rotate of camera around world

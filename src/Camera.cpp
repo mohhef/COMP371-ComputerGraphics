@@ -14,11 +14,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 worldUp, glm::vec3 target)
 	mouseSensitivity = DEFAULT_SENSITIVITY;
 	zoom = DEFAULT_ZOOM;
 
-	glm::vec3 cameraFront;
-	cameraFront.x = cos(glm::radians(DEFAULT_YAW)) * cos(glm::radians(DEFAULT_PITCH));
-	cameraFront.y = sin(glm::radians(DEFAULT_PITCH));
-	cameraFront.z = sin(glm::radians(DEFAULT_YAW)) * cos(glm::radians(DEFAULT_PITCH));
-	front = glm::normalize(cameraFront);
+	front = glm::normalize(target - position);
 
 	right = glm::normalize(glm::cross(front, worldUp));
 
