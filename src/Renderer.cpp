@@ -30,11 +30,6 @@ Renderer& Renderer::getInstance()
 	return s_Instance;
 }
 
-void Renderer::setRenderMethod(unsigned int method) 
-{
-	renderMethod = method;
-}
-
 void Renderer::setRenderIndex(unsigned int index)
 {
 	renderIndex = index;
@@ -122,7 +117,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
 
 			glm::mat4 model = glm::mat4(1.0f) * corner * initialPos * modelCubePos * modelScale.at(positionIndex);
 			shader.setUniform4Mat("model", model);
-			glDrawArrays(renderMethod, 0, 36);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		corner = transRightCorner;
 	}
@@ -142,7 +137,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
 				* glm::scale(glm::mat4(1.0f), wallScales.at(positionIndex).at(i));
 			
 			shader.setUniform4Mat("model", model);
-			glDrawArrays(renderMethod, 0, 36);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 		corner = transRightCorner;
 	}
@@ -163,7 +158,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i) * modelScale.at(renderIndex) * modelTransMat.at(i);
 
 		shader.setUniform4Mat("model", model);
-		glDrawArrays(renderMethod, 0, 36);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 	va.unbind();
 	shader.unbind();
@@ -192,7 +187,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor, glm:
 
 		shader.setUniform4Mat("model", model);
 
-		glDrawArrays(renderMethod, 0, 36);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
   
 	va.unbind();

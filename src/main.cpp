@@ -205,13 +205,13 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-		Renderer::getInstance().setRenderMethod(GL_POINTS);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
 	if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
-		Renderer::getInstance().setRenderMethod(GL_LINES);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-		Renderer::getInstance().setRenderMethod(GL_TRIANGLES);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void processMouse(GLFWwindow* window, double xpos, double  ypos)

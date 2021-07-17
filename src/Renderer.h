@@ -17,7 +17,6 @@ bool glLogCall(const char* function, const char* file, int line);
 class Renderer
 {
 private:
-	unsigned int renderMethod = GL_TRIANGLES;
 	unsigned int renderIndex = 0;
 	static Renderer s_Instance;
 	Renderer();
@@ -26,10 +25,9 @@ public:
 	Renderer(const Renderer&) = delete;
 	void setRenderMethod(unsigned int method);
 	void setRenderIndex(unsigned int index);
-	void clear() const;
-	void draw(const VertexArray& va, const Shader& shader) const;
 
 	// draw functions
+	void clear() const;
 	void drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection);
 	void drawStaticObjects(VertexArray& va, Shader& shader);
 	void drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> moddelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement);
