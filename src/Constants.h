@@ -197,8 +197,7 @@ static vector<glm::mat4> modelScale
 // initial configuration position of model (to align with hole)
 static vector<glm::vec3> modelPosition =
 {
-
-		glm::vec3(0.0f, 5.0f, 10.0f),
-		glm::vec3(-8.0f, 20.0f, 10.0f),
-		glm::vec3(0.0f, 17.2f, 10.0f)
+	glm::vec3(0.0f, 5.0f, 10.0f),
+	glm::vec3(-8.0f, 20.0f, 10.0f),
+	glm::vec3(0.0f, 17.2f, 10.0f)
 };

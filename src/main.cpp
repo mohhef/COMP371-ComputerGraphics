@@ -137,7 +137,8 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, 0.0f));
-
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		resetModel();
 	// scale model
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && scaleFactor < 1.25f)
 		scaleFactor += 0.01f;
@@ -290,16 +291,11 @@ int main(int argc, char* argv[])
 		Shader* axesShader = new Shader("axes.shader");
 		Shader* meshShader = new Shader("vertex_fragment.shader");
 
-
-
 		Renderer& renderer = Renderer::getInstance();
-
 
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-
 
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),

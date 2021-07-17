@@ -52,7 +52,6 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.setUniform4Mat("model", model);
 
 	shader.setUniform4Vec("ourColor", glm::vec4(1.0, 0.0, 0.0, 1.0));
-	shader.setUniform4Mat("model", model);
 	GLCall(glDrawArrays(GL_LINES, 0, 2));
 
 	model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -154,17 +153,16 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 	shader.setUniform4Vec("ourColor", glm::vec4(0, 1, 1, 1));
 	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	float time = (float)glfwGetTime();
-		for (int i = 0; i < numCubePieces; i++)
-		{
-			glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(displacement.x, 0.0f, displacement.z));
-			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(renderIndex));
+	for (int i = 0; i < numCubePieces; i++){
+		glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(displacement.x, 0.0f, displacement.z));
+		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(renderIndex));
 
-			// unit matrix * scaling input * xz_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
-			glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i) * modelScale.at(renderIndex) * modelTransMat.at(i);
+		// unit matrix * scaling input * xz_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
+		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i) * modelScale.at(renderIndex) * modelTransMat.at(i);
 
-			shader.setUniform4Mat("model", model);
-			glDrawArrays(renderMethod, 0, 36);
-		}
+		shader.setUniform4Mat("model", model);
+		glDrawArrays(renderMethod, 0, 36);
+	}
 	va.unbind();
 	shader.unbind();
 }
