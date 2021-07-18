@@ -8,9 +8,10 @@ static const double pi = 3.14159265358979323846;
 
 static float deltaTime = 0.0f;
 static float lastFrame = 0.0f;
-static float wallZPos = -10.0f;
-static int modelIndex = 0;
+static float wallZPos = -10.0f; // wall offset from origin
+static int modelIndex = 0; // initial index to display the model
 
+// window size
 static const int HEIGHT = 768;
 static const int WIDTH = 1024;
 
@@ -20,6 +21,7 @@ static float pitch = 0.0f;
 static float yaw = -90.0f;
 static bool initialMousePos = true;
 
+// Vertices used to draw a cube
 static float vertices[] =
 {
 	-0.5f, -0.5f, -0.5f,
@@ -65,12 +67,14 @@ static float vertices[] =
 	-0.5f,  0.5f, -0.5f
 };
 
+// Vertices for a line which is used by the axes
 static float axesVertices[] =
 {
 	0.0f, 0.0f, 0.0f,
 	1.0f, 0.0f, 0.0f
 };
 
+// Vertices for a line which is used by the mesh
 static float meshVertices[] = {
 	0.0f, 0.0f, 0.0f,
 	1.0f, 0.0f, 0.0f
