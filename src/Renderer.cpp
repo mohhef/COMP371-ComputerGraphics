@@ -19,7 +19,7 @@ bool glLogCall(const char* function, const char* file, int line)
 	return true;
 }
 
-// Clears openGL of errors
+// Clears openGL buffer bits
 void Renderer::clear() const
 {
 	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
