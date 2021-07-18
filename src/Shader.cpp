@@ -7,9 +7,11 @@
 #include "Renderer.h"
 
 
+// Shader constructor using the filepath
 Shader::Shader(const std::string& filePath)
 {
 	this->filePath = filePath;
+	// Creating a program source object to store the shaders at the specified file path
 	ShaderProgramSource source = parseShader(filePath);
 	std::cout << source.vertexSource << std::endl;
 	std::cout << source.fragmentSource << std::endl;
@@ -17,11 +19,13 @@ Shader::Shader(const std::string& filePath)
 
 }
 
+// Destructor
 Shader::~Shader()
 {
 	GLCall(glDeleteProgram(id));
 }
 
+// Method for creating the shader and returning its id
 unsigned int Shader::createShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
 	// create shader program
@@ -73,6 +77,7 @@ unsigned int Shader::compileShader(unsigned int type, const std::string& source)
 	return id;
 }
 
+// Method for parsing the shader at the specified file path
 ShaderProgramSource Shader::parseShader(const std::string& filepath)
 {
 	std::ifstream stream(filepath);
@@ -80,8 +85,11 @@ ShaderProgramSource Shader::parseShader(const std::string& filepath)
 	std::string line;
 	std::stringstream ss[2];
 	ShaderType type = ShaderType::NONE;
+
+	// Read through the program line by line
 	while (getline(stream, line)) {
 
+		// If the line contains #shader vertex or #shader fragment, add the following lines to the appropriate array for storage
 		if (line.find("#shader") != std::string::npos)
 		{
 			if (line.find("vertex") != std::string::npos)
@@ -97,12 +105,13 @@ ShaderProgramSource Shader::parseShader(const std::string& filepath)
 	return { ss[0].str(), ss[1].str() };
 }
 
-
+// Bind the shader
 void Shader::bind() const
 {
 	GLCall(glUseProgram(id));
 }
 
+// unbind the shader
 void Shader::unbind() const
 {
 	GLCall(glUseProgram(0));

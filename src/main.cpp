@@ -24,12 +24,14 @@
 
 using namespace std;
 
-// modified throughout run - to reset between runs - possible bound to a single model (modelIndex) - to reset between models
+// Modified throughout run and to reset between runs.
+// Possibly bound to a single model (modelIndex)
 vector<glm::mat4> modelTransMat;
 vector<glm::mat4> modelRotMat;
 glm::vec3 displacement;
 float scaleFactor = 1.0f;
 
+// Cursor positions for mouse inputs
 float lastMouseX;
 float lastMouseY;
 
@@ -39,7 +41,7 @@ GLFWwindow* initializeWindow()
 {
 	GLFWwindow* window;
 
-	/* Initialize the library */
+	// Initialize the library
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
 
@@ -66,11 +68,12 @@ GLFWwindow* initializeWindow()
 		exit(EXIT_FAILURE);
 	}
 
-	// background color
+	// Background color
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	return window;
 }
 
+// Reset translation matrix for each model's cube.
 void resetTransMat()
 {
 	modelTransMat.resize(modelCubePositions.at(modelIndex).size());
@@ -82,6 +85,7 @@ void resetTransMat()
 	}
 }
 
+// Reset model's rotation matrix.
 void resetRotMat()
 {
 	modelRotMat.resize(modelCubePositions.at(modelIndex).size());
@@ -89,6 +93,7 @@ void resetRotMat()
 		modelRotMat.at(i) = glm::mat4(1.0f);
 }
 
+// Reset model to initial position
 void resetModel()
 {
 	resetTransMat();
@@ -98,12 +103,14 @@ void resetModel()
 	scaleFactor = 1.0f;
 }
 
+// Handle all keyboard inputs
 void processInput(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	// closes window
+	// Closes window
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
+	// Toggle between models (1-2-3)
 	if (key == GLFW_KEY_1 || key == GLFW_KEY_2 || key == GLFW_KEY_3) {
 		if (key == GLFW_KEY_1) {
 			modelIndex = 0;
@@ -123,7 +130,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 			glm::vec3(0.0f, 0.0f, 0.0f));
 	}
 	
-	// rotate of camera around world
+	// Camera rotation around world axis (UP/DOWN/LEFT/RIGHT)
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		camera->processMovement(KEY::UP, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
@@ -133,20 +140,23 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
 		camera->processMovement(KEY::RIGHT, deltaTime);
 
-	// reset camera
+	// Camera reset (HOME)
 	if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, 0.0f));
+
+	// Reset model (SPACEBAR)
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 		resetModel();
-	// scale model
+
+	// Scale model and wall (U/J)
 	if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS && scaleFactor < 1.25f)
 		scaleFactor += 0.01f;
 	if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS && scaleFactor > 0.75f)
 		scaleFactor -= 0.01f;
 
-	// rotate model
+	// Model displacement (W/S/A/D) and rotation (w/s/a/d), the latter of which around it's own axis.
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		if (mode == GLFW_MOD_SHIFT && displacement.z != -100.f)
@@ -204,6 +214,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		}
 	}
 
+	// Toggle rendering mode between point, line and fill mode (P/L/T)
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
@@ -214,8 +225,11 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
+
+// Function for processing mouse input
 void processMouse(GLFWwindow* window, double xpos, double  ypos)
 {
+	// Required for continous call (holding down button)
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE
 		&& glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE
 		&& glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_RELEASE)
@@ -224,6 +238,8 @@ void processMouse(GLFWwindow* window, double xpos, double  ypos)
 		return;
 	}
 
+	// Required to prevent jump when toggling mouse button
+	// Note that call can be made from different cursor position
 	if (initialMousePos)
 	{
 		lastMouseX = xpos;
@@ -231,6 +247,7 @@ void processMouse(GLFWwindow* window, double xpos, double  ypos)
 		initialMousePos = false;
 	}
 
+	// Camera zoom (LMB)
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
 	{
 		float yOffset = lastMouseY - ypos;
@@ -241,6 +258,7 @@ void processMouse(GLFWwindow* window, double xpos, double  ypos)
 		camera->zoomCamera(yOffset);
 	}
 
+	// Camera pan (RMB)
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
 	{
 		float xOffset = lastMouseX - xpos;
@@ -251,6 +269,7 @@ void processMouse(GLFWwindow* window, double xpos, double  ypos)
 		camera->panCamera(xOffset);
 	}
 
+	// Camera tilt (MMB)
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
 	{
 		float yOffset = lastMouseY - ypos;
@@ -288,34 +307,39 @@ int main(int argc, char* argv[])
 		layoutMesh.push<float>(3);
 		vaMesh.addBuffer(vbMesh, layoutMesh);
 
+		// Create shader instances
 		Shader* shader = new Shader("vertex_fragment.shader");
 		Shader* axesShader = new Shader("axes.shader");
 		Shader* meshShader = new Shader("vertex_fragment.shader");
 
 		Renderer& renderer = Renderer::getInstance();
 
+		// Renddering setup
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+		// Create camera instance
+		// Position: behind model, along Z-axis.
+		// Target: world origin (initially)
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, 0.0f));
 
-		// initialize model matricies for each cube within each model 
+		// Initialize model matricies for each cube within each model 
 		resetModel();
 		glfwSetKeyCallback(window, processInput);
 		glfwSetCursorPosCallback(window, processMouse);
 
-		// Entering Main Loop
+		// Entering main loop
 		while (!glfwWindowShouldClose(window))
 		{
-
-			// update last frame
+			// Update last frame
 			float currentFrame = glfwGetTime();
 			deltaTime = currentFrame - lastFrame;
 			lastFrame = currentFrame;
 
+			// Clear color and depth buffers
 			renderer.clear();
       
 			shader->bind();
@@ -324,15 +348,15 @@ int main(int argc, char* argv[])
 
 			shader->setUniform4f("ourColor", 1, 0, 0, 1);
 
-			// update projection matrix and pass to shader
+			// Update projection matrix and pass to shader
 			glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 200.0f);
 			shader->setUniform4Mat("projection", projection);
 
-			// update view matrix and pass to shader
+			// Update view matrix and pass to shader
 			glm::mat4 view = camera->getViewMatrix();
 			shader->setUniform4Mat("view", view);
 
-			// render 
+			// Render each object (wall, model, static models, axes, and mesh floor)
 			renderer.drawWall(vA, *shader, scaleFactor, displacement);
 			renderer.drawObject(vA, *shader, modelRotMat, modelTransMat, scaleFactor, displacement);
 			renderer.drawStaticObjects(vA, *shader);
@@ -341,6 +365,7 @@ int main(int argc, char* argv[])
 
 			// End frame
 			glfwSwapBuffers(window);
+
 			// Detect inputs
 			glfwPollEvents();
 		}

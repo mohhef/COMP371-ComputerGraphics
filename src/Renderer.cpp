@@ -2,11 +2,13 @@
 #include <iostream>
 #include "Shader.h"
 
+// Clear openGL errors, makes it easier for debugging
 void glClearError()
 {
 	while (glGetError() != GL_NO_ERROR);
 }
 
+// Called on openGL error
 bool glLogCall(const char* function, const char* file, int line) 
 {
 	while (GLenum error = glGetError()) {
@@ -17,24 +19,29 @@ bool glLogCall(const char* function, const char* file, int line)
 	return true;
 }
 
+// Clears openGL buffer bits
 void Renderer::clear() const
 {
 	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
+// Renderer singleton instance
 Renderer Renderer::s_Instance;
 Renderer::Renderer() {};
 
+// Getting singleton instance
 Renderer& Renderer::getInstance()
 {
 	return s_Instance;
 }
 
+// Setting the renderIndex to render the appropriate model on key press
 void Renderer::setRenderIndex(unsigned int index)
 {
 	renderIndex = index;
 }
 
+// Renderer for rendering the axes
 void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection)
 {
 	va.bind();
@@ -63,18 +70,24 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.unbind();
 }
 
+// Renderer for drawing the mesh
 void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, float scaleFactor)
 {
+	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
 
+	// Setting the appropriate materials to be viewed appropriately in 3d
 	shader.setUniform4Mat("view", view);
 	shader.setUniform4Mat("projection", projection);
+	// Setting the material for color
 	shader.setUniform4Vec("ourColor", glm::vec4(0.5, 0.5, 0.5, 0.0f));
 
+	// Materials to be used by the following for loop
 	glm::mat4 model;
 	glm::mat4 model2;
 
+	// for loop that draws vertically and horizontally all the lines from -50 to +50 to cover the entire mesh in a 100x100 grid
 	for (float current = -50.0f; current <= 50.0f; current += 1.0f) {
 
 		// center line * scaling
@@ -91,17 +104,23 @@ void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 		GLCall(glDrawArrays(GL_LINES, 0, 2));
 	}
 
+	// Unbinding for easier debugging
 	va.unbind();
 	shader.unbind();
 }
 
+// Renderer for drawing the static models and walls at the corners of the map
 void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
+	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
+
+	// Getting the index for drawing the models in the appropriate position
 	int index = this->renderIndex;
 	vector<vector<int>> staticPositions = { {2,1},{0,2},{0,1} };
 	vector<int> staticVector = staticPositions.at(renderIndex);
 
+	// Translation to put non-centered models
 	glm::mat4 transLeftCorner = glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, -30.0f));
 	glm::mat4 transRightCorner = glm::translate(glm::mat4(1.0f), glm::vec3(30.0f, 0.0f, -30.0f));
 	glm::mat4 corner = transLeftCorner;
@@ -110,6 +129,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
 	for (int i = 0; i < staticPositions.at(renderIndex).size(); i++) {
 		int positionIndex = staticVector.at(i);
 
+		// drawing all the cubes for the associated object at index i
 		int numCubePieces = modelCubePositions.at(positionIndex).size();
 		for (int i = 0; i < numCubePieces; i++) {
 			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(positionIndex));
@@ -128,6 +148,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
 		int positionIndex = staticVector.at(i);
 		int numWallPieces = wallCubePositions.at(positionIndex).size();
 
+		// drawing all the wall cubes for the associated object at index i
 		for (int i = 0; i < numWallPieces; i++){
 			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(positionIndex));
 			glm::mat4 model = glm::mat4(1.0f)
@@ -143,14 +164,19 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
 	}
 }
 
+// Draw the model that is currently in use
 void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement) 
 {
+	// Bind the vertex array and shader
 	va.bind();
 	shader.bind();
+
 	shader.setUniform4Vec("ourColor", glm::vec4(0, 1, 1, 1));
 	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	float time = (float)glfwGetTime();
+	// draw the model from all the cubes
 	for (int i = 0; i < numCubePieces; i++){
+		// adjust position based on user input
 		glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(displacement.x, 0.0f, displacement.z));
 		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(renderIndex));
 
@@ -160,12 +186,16 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 		shader.setUniform4Mat("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
+
+	// unbind for easier debugging
 	va.unbind();
 	shader.unbind();
 }
 
+// Draw the wall that is currently in use
 void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor, glm::vec3 displacement) 
 {
+	// bind the vertex array and shader
 	va.bind();
 	shader.bind();
 
@@ -186,10 +216,10 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor, glm:
 			* glm::scale(glm::mat4(1.0f), wallScales.at(renderIndex).at(i));
 
 		shader.setUniform4Mat("model", model);
-
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
   
+	// unbind for easier debugging
 	va.unbind();
 	shader.unbind();
 }
