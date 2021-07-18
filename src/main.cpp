@@ -214,7 +214,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		}
 	}
 
-	// Toggle display between point, line and fill mode (P/L/T)
+	// Toggle rendering mode between point, line and fill mode (P/L/T)
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
@@ -225,7 +225,8 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-// Handle all keyboard inputs
+
+// Function for processing mouse input
 void processMouse(GLFWwindow* window, double xpos, double  ypos)
 {
 	// Required for continous call (holding down button)
