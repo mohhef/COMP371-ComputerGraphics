@@ -71,6 +71,7 @@ GLFWwindow* initializeWindow()
 	return window;
 }
 
+// Reset model to original position
 void resetTransMat()
 {
 	modelTransMat.resize(modelCubePositions.at(modelIndex).size());
@@ -82,6 +83,7 @@ void resetTransMat()
 	}
 }
 
+// Reset model to original orientation
 void resetRotMat()
 {
 	modelRotMat.resize(modelCubePositions.at(modelIndex).size());
@@ -89,6 +91,7 @@ void resetRotMat()
 		modelRotMat.at(i) = glm::mat4(1.0f);
 }
 
+// Reset model to original position and orientation
 void resetModel()
 {
 	resetTransMat();
@@ -98,12 +101,14 @@ void resetModel()
 	scaleFactor = 1.0f;
 }
 
+// Function for taking keyboard input and mapping to functionality
 void processInput(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
 	// closes window
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 
+	// Maps the number keys to the appropriate model
 	if (key == GLFW_KEY_1 || key == GLFW_KEY_2 || key == GLFW_KEY_3) {
 		if (key == GLFW_KEY_1) {
 			modelIndex = 0;
@@ -204,6 +209,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		}
 	}
 
+	// Update the rendering mode on key press.
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 
@@ -214,6 +220,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
+// Function for processing mouse input
 void processMouse(GLFWwindow* window, double xpos, double  ypos)
 {
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE
@@ -288,6 +295,7 @@ int main(int argc, char* argv[])
 		layoutMesh.push<float>(3);
 		vaMesh.addBuffer(vbMesh, layoutMesh);
 
+		// Create Shaders
 		Shader* shader = new Shader("vertex_fragment.shader");
 		Shader* axesShader = new Shader("axes.shader");
 		Shader* meshShader = new Shader("vertex_fragment.shader");
@@ -298,6 +306,7 @@ int main(int argc, char* argv[])
 		glDepthFunc(GL_LESS);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+		// initialize camera
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, 0.0f));
