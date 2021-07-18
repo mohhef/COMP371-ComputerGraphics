@@ -29,7 +29,7 @@ Simply load the solution (ideally in `VS2019`) and run `main.cpp`.
 
 Mohamed Hefny | 40033382  
 Nicholas Nagy | 40059460  
-Manpreet Tahim |  
+Manpreet Tahim | 26592066
 
 ## References  
 
