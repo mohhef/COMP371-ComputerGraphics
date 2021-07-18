@@ -25,6 +25,12 @@ Simply load the solution (ideally in `VS2019`) and run `main.cpp`.
 - MMB: tilt camera.
 - ESC: close window.
 
+## Contributors
+
+Mohamed Hefny | 40033382  
+Nicholas Nagy | 40059460  
+Manpreet Tahim |  
+
 ## References  
 
 - *Welcome to OpenGL*. Learn OpenGL, extensive tutorial resource for learning Modern OpenGL. (n.d.). https://learnopengl.com/. 
