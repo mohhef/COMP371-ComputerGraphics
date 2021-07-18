@@ -6,19 +6,19 @@ using namespace std;
 
 static const double pi = 3.14159265358979323846;
 
-static float deltaTime = 0.0f;
-static float lastFrame = 0.0f;
+static float deltaTime = 0.0f; // Time increment between frame buffering
+static float lastFrame = 0.0f; // Time at which last frame was buffered
+
 static float wallZPos = -10.0f; // wall offset from origin
 static int modelIndex = 0; // initial index to display the model
 
-// window size
+// Window size
 static const int HEIGHT = 768;
 static const int WIDTH = 1024;
 
+// Cursor position parameters
 static float lastX = WIDTH / 2;
 static float lastY = HEIGHT / 2;
-static float pitch = 0.0f;
-static float yaw = -90.0f;
 static bool initialMousePos = true;
 
 // Vertices used to draw a cube
