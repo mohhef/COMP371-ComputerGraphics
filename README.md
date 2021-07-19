@@ -13,6 +13,8 @@ Simply load the solution (ideally in `VS2019`) and run `main.cpp`.
 - A/D: displacement along X-axis (must hold shift).
 - w/s: rotate model along X-axis.
 - a/d: rotate model along Y-axis.
+- CTR + w/s: rotate model and wall along X-axis.
+- CTR + a/d: rotate model and wall along Y-axis.
 - P/L/T: toggle object display between point, line, and fill, respectively.
 - U/J: scale model.
 - UP/DOWN: rotate camera along X-axis.
