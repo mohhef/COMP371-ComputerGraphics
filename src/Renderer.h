@@ -18,6 +18,7 @@ class Renderer
 {
 private:
 	unsigned int renderIndex = 0;
+	glm::mat4 rotationMatrix = glm::mat4(1.0f);
 	bool combinedRot = false;
 	static Renderer s_Instance;
 	Renderer();

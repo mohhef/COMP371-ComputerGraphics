@@ -27,7 +27,8 @@ void Renderer::clear() const
 
 // Renderer singleton instance
 Renderer Renderer::s_Instance;
-Renderer::Renderer() {};
+Renderer::Renderer() {
+};
 
 // Getting singleton instance
 Renderer& Renderer::getInstance()
@@ -203,15 +204,10 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, vector<glm::mat4> model
 	va.bind();
 	shader.bind();
 
-	//initialize a matrix of 1s if  there is no rotation
-	vector<glm::mat4> rotationMatrix;
-	for (int i = 0; i < modelRotMat.size(); i++)
-		rotationMatrix.push_back(glm::mat4(1.0f));
-
+	//using the same roation as the object will work 
 	if (combinedRot == true) {
-		rotationMatrix = modelRotMat;
+		rotationMatrix = modelRotMat.at(1);
 	}
-
 
 	shader.setUniform4Vec("ourColor", glm::vec4(0.63f, 0.63f, 0.63f, 1));
 	int numWallPieces = wallCubePositions.at(renderIndex).size();
@@ -226,7 +222,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, vector<glm::mat4> model
 			* glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor))
 			* trans
 			* initialPos
-			* rotationMatrix.at(i)
+			* rotationMatrix
 			* glm::translate(glm::mat4(1.0f), wallCubePositions.at(renderIndex).at(i))
 			* glm::scale(glm::mat4(1.0f), wallScales.at(renderIndex).at(i));
 
