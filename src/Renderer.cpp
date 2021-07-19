@@ -41,6 +41,10 @@ void Renderer::setRenderIndex(unsigned int index)
 	renderIndex = index;
 }
 
+void Renderer::setRenderCombinedRot(bool rot) {
+	combinedRot = rot;
+}
+
 // Renderer for rendering the axes
 void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection)
 {
@@ -193,11 +197,21 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 }
 
 // Draw the wall that is currently in use
-void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor, glm::vec3 displacement) 
+void Renderer::drawWall(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement) 
 {
 	// bind the vertex array and shader
 	va.bind();
 	shader.bind();
+
+	//initialize a matrix of 1s if  there is no rotation
+	vector<glm::mat4> rotationMatrix;
+	for (int i = 0; i < modelRotMat.size(); i++)
+		rotationMatrix.push_back(glm::mat4(1.0f));
+
+	if (combinedRot == true) {
+		rotationMatrix = modelRotMat;
+	}
+
 
 	shader.setUniform4Vec("ourColor", glm::vec4(0.63f, 0.63f, 0.63f, 1));
 	int numWallPieces = wallCubePositions.at(renderIndex).size();
@@ -212,6 +226,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, float scaleFactor, glm:
 			* glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor))
 			* trans
 			* initialPos
+			* rotationMatrix.at(i)
 			* glm::translate(glm::mat4(1.0f), wallCubePositions.at(renderIndex).at(i))
 			* glm::scale(glm::mat4(1.0f), wallScales.at(renderIndex).at(i));
 
