@@ -89,6 +89,7 @@ void resetTransMat()
 // Reset model's rotation matrix.
 void resetRotMat()
 {
+	Renderer::getInstance().setRenderCombinedRot(true);
 	modelRotMat.resize(modelCubePositions.at(modelIndex).size());
 	for (int i = 0; i < modelCubePositions.at(modelIndex).size(); i++)
 		modelRotMat.at(i) = glm::mat4(1.0f);
