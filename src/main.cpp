@@ -30,6 +30,7 @@ vector<glm::mat4> modelTransMat;
 vector<glm::mat4> modelRotMat;
 glm::vec3 displacement;
 float scaleFactor = 1.0f;
+bool combinedRot = false;
 
 // Cursor positions for mouse inputs
 float lastMouseX;
@@ -88,6 +89,7 @@ void resetTransMat()
 // Reset model's rotation matrix.
 void resetRotMat()
 {
+	Renderer::getInstance().setRenderCombinedRot(true);
 	modelRotMat.resize(modelCubePositions.at(modelIndex).size());
 	for (int i = 0; i < modelCubePositions.at(modelIndex).size(); i++)
 		modelRotMat.at(i) = glm::mat4(1.0f);
@@ -106,6 +108,10 @@ void resetModel()
 // Handle all keyboard inputs
 void processInput(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
+	//Toggle rotate object only or wall & object
+	mode == GLFW_MOD_CONTROL?
+		Renderer::getInstance().setRenderCombinedRot(true):Renderer::getInstance().setRenderCombinedRot(false);
+
 	// Closes window
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
@@ -163,6 +169,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 			displacement.z -= 0.50f;
 		else
 		{
+
 			for (int i = 0; i < modelRotMat.size(); i++)
 			{
 				glm::mat4 model = glm::mat4(1.0f);
@@ -357,7 +364,7 @@ int main(int argc, char* argv[])
 			shader->setUniform4Mat("view", view);
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
-			renderer.drawWall(vA, *shader, scaleFactor, displacement);
+			renderer.drawWall(vA, *shader,modelRotMat, scaleFactor, displacement);
 			renderer.drawObject(vA, *shader, modelRotMat, modelTransMat, scaleFactor, displacement);
 			renderer.drawStaticObjects(vA, *shader);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
