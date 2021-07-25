@@ -32,6 +32,7 @@ public:
 	// draw functions
 	void clear() const;
 	void drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection);
+	void drawLightingSource(VertexArray& va, Shader& shader, glm::vec3 lightPos, glm::mat4 view, glm::mat4 projection);
 	void drawStaticObjects(VertexArray& va, Shader& shader);
 	void drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> moddelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement);
 	void drawWall(VertexArray & va, Shader & shader, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement);

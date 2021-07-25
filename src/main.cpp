@@ -298,7 +298,16 @@ int main(int argc, char* argv[])
 		VertexBufferLayout layout;
     
 		layout.push<float>(3);
+		layout.push<float>(3);
 		vA.addBuffer(vB, layout);
+
+		// Setup for lighting
+		VertexArray vaLightingSource;
+		VertexBuffer vblightingSource(vertices, sizeof(vertices));
+		VertexBufferLayout layoutLightingSource;
+		layoutLightingSource.push<float>(3);
+		layoutLightingSource.push<float>(3);
+		vaLightingSource.addBuffer(vblightingSource, layoutLightingSource);
 
 		// Setup for axes
 		VertexArray vaAxes;
@@ -317,7 +326,8 @@ int main(int argc, char* argv[])
 		// Create shader instances
 		Shader* shader = new Shader("vertex_fragment.shader");
 		Shader* axesShader = new Shader("axes.shader");
-		Shader* meshShader = new Shader("vertex_fragment.shader");
+		Shader* meshShader = new Shader("axes.shader");
+		Shader* lightingSourceShader = new Shader("lightingSource.shader");
 
 		Renderer& renderer = Renderer::getInstance();
 
@@ -332,7 +342,7 @@ int main(int argc, char* argv[])
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, 0.0f));
-
+		glm::vec3 lightPos(0.0, 40.0f, 20.0f);
 		// Initialize model matricies for each cube within each model 
 		resetModel();
 		glfwSetKeyCallback(window, processInput);
@@ -353,7 +363,10 @@ int main(int argc, char* argv[])
 			vA.bind();
 			vB.bind();
 
-			shader->setUniform4f("ourColor", 1, 0, 0, 1);
+			shader->setUniform3Vec("ourColor", glm::vec3(1.0f, 0.5f, 0.31f));
+			shader->setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+			shader->setUniform3Vec("lightPos", lightPos);
+			shader->setUniform3Vec("viewPos", camera->position);
 
 			// Update projection matrix and pass to shader
 			glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 200.0f);
@@ -365,6 +378,7 @@ int main(int argc, char* argv[])
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
 			renderer.drawWall(vA, *shader,modelRotMat, scaleFactor, displacement);
+			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader,lightPos, view, projection);
 			renderer.drawObject(vA, *shader, modelRotMat, modelTransMat, scaleFactor, displacement);
 			renderer.drawStaticObjects(vA, *shader);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
