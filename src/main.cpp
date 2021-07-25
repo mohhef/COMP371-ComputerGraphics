@@ -38,6 +38,11 @@ float lastMouseY;
 
 Camera* camera = NULL;
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+}
+
 GLFWwindow* initializeWindow()
 {
 	GLFWwindow* window;
@@ -60,6 +65,7 @@ GLFWwindow* initializeWindow()
 		exit(EXIT_FAILURE);
 	}
 	glfwMakeContextCurrent(window);
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSwapInterval(1);
 
 	// Initialize GLEW
