@@ -220,7 +220,24 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 			}
 		}
 	}
-
+	if (key == GLFW_KEY_Q)
+	{
+		for (int i = 0; i < modelRotMat.size(); i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::rotate(model, glm::radians(5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			modelRotMat.at(i) = model * modelRotMat.at(i);
+		}
+	}
+	if (key == GLFW_KEY_E)
+	{
+		for (int i = 0; i < modelRotMat.size(); i++)
+		{
+			glm::mat4 model = glm::mat4(1.0f);
+			model = glm::rotate(model, glm::radians(-5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			modelRotMat.at(i) = model * modelRotMat.at(i);
+		}
+	}
 	// Toggle rendering mode between point, line and fill mode (P/L/T)
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
