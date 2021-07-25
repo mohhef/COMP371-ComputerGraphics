@@ -33,13 +33,13 @@ void main()
 {
     //ambient
     float ambientFactor = 0.1;
-    vec3 ambient = ambientFactor * lightColor;
+    vec3 ambientVal = ambientFactor * lightColor;
 
     // diffuse 
     vec3 norm = normalize(Normal);
     vec3 lightDirection = normalize(lightPos - FragPos);
     float diff = max(dot(norm, lightDirection), 0.0);
-    vec3 diffuse = diff * lightColor;
+    vec3 diffuseVal = diff * lightColor;
 
     // specular
     float specularFactor = 0.5;
@@ -47,8 +47,8 @@ void main()
     vec3 reflectDirection = reflect(-lightDirection, norm);
     int shininess = 32;
     float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), shininess);
-    vec3 specular = specularFactor * spec * lightColor;
+    vec3 specularVal = specularFactor * spec * lightColor;
 
-    vec3 result = (ambient+diffuse+specular) * ourColor;
+    vec3 result = (ambientVal+diffuseVal+specularVal) * ourColor;
     FragColor = vec4(result,1.0f);
 }
