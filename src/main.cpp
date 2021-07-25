@@ -365,7 +365,10 @@ int main(int argc, char* argv[])
 		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
 			glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(0.0f, 0.0f, 0.0f));
+
+		// Position of the light source
 		glm::vec3 lightPos(0.0, 40.0f, 20.0f);
+
 		// Initialize model matricies for each cube within each model 
 		resetModel();
 		glfwSetKeyCallback(window, processInput);

@@ -204,6 +204,7 @@ void Renderer::drawLightingSource(VertexArray& va, Shader& shader,glm::vec3 ligh
 	shader.setUniform4Mat("view", view);
 	shader.setUniform4Mat("projection", projection);
 
+	//adjust the light source position & scale it
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, lightPos);
 	model = glm::scale(model, glm::vec3(2.0f));

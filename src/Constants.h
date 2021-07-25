@@ -21,10 +21,10 @@ static float lastX = WIDTH / 2;
 static float lastY = HEIGHT / 2;
 static bool initialMousePos = true;
 
-// Vertices used to draw a cube
+//Position(f,f,f) Normal(f,f,f) 
 static float vertices[] =
 {
- -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+	-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 	 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 	 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
