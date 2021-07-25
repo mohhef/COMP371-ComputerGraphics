@@ -196,6 +196,27 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 	shader.unbind();
 }
 
+//Draw the lighting object
+void Renderer::drawLightingSource(VertexArray& va, Shader& shader,glm::vec3 lightPos, glm::mat4 view, glm::mat4 projection) {
+	va.bind();
+	shader.bind();
+
+	shader.setUniform4Mat("view", view);
+	shader.setUniform4Mat("projection", projection);
+
+	//adjust the light source position & scale it
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, lightPos);
+	model = glm::scale(model, glm::vec3(2.0f));
+	shader.setUniform4Mat("model", model);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	va.unbind();
+	shader.unbind();
+}
+
+
 // Draw the wall that is currently in use
 void Renderer::drawWall(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement) 
 {
