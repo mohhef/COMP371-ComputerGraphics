@@ -64,7 +64,7 @@ static float vertices[] =
 	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
 	 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
 	-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f 
+	-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
 // Vertices for a line which is used by the axes
@@ -109,6 +109,15 @@ static  vector<vector<glm::vec3>> wallCubePositions =
 		glm::vec3(2.0f, 15.45f, wallZPos),
 		glm::vec3(4.0f, 10.5f, wallZPos),
 	},
+	{
+		glm::vec3(0.0f, 0.0f, wallZPos),
+		glm::vec3(0.0f, 20.0f, wallZPos),
+		glm::vec3(-7.5f, 10.0f, wallZPos),
+		glm::vec3(7.5f, 10.0f, wallZPos),
+		glm::vec3(-2.0f, 10.0f, wallZPos),
+		glm::vec3(-1.0f, 8.0f, wallZPos),
+		glm::vec3(3.0f, 10.0f, wallZPos),
+	},
 };
 
 // initial configuration scale of wall cubes
@@ -140,6 +149,15 @@ static vector<vector<glm::vec3>> wallScales =
 		glm::vec3(6.0f, 3.7f, 1.0f),
 		glm::vec3(2.0f, 2.0f, 1.0f),
 	},
+	{
+		glm::vec3(20.0f, 10.0f, 1.0f),
+		glm::vec3(20.0f, 10.0f, 1.0f),
+		glm::vec3(5.0f, 10.0f, 1.0f),
+		glm::vec3(5.0f, 10.0f, 1.0f),
+		glm::vec3(2.0f, 6.0f, 1.0f),
+		glm::vec3(4.0f, 2.0f, 1.0f),
+		glm::vec3(4.0f, 6.0f, 1.0f),
+	}
 };
 
 // initial configuration position of wall (to align with XZ plane)
@@ -148,6 +166,7 @@ static vector<glm::vec3> wallPosition =
 	glm::vec3(0.0f, 1.0f, 10.0f),
 	glm::vec3(0.0f, 7.5f, 10.0f),
 	glm::vec3(0.0f, 4.7f, 10.0f),
+	glm::vec3(0.0f, 5.0f, 0.0f)
 };
 
 // initial configuration of cubes for model
@@ -188,6 +207,48 @@ static vector<vector<glm::vec3>> modelCubePositions =
 		glm::vec3(0.0f, 1.0f, 2.0f),
 		glm::vec3(0.0f, 2.0f, 1.0f),
 	},
+	{
+		glm::vec3(0.0f, 0.0f, 0.0f), 
+		glm::vec3(0.0f, 1.0f, 0.0f), 
+		glm::vec3(0.0f, 2.0f, 0.0f),  
+		glm::vec3(0.0f, 2.0f, 1.0f), 
+		glm::vec3(0.0f, 2.0f, 2.0f), 
+		glm::vec3(1.0f, 2.0f, 2.0f), 
+		glm::vec3(2.0f, 2.0f, 2.0f),
+		glm::vec3(2.0f, 2.0f, 1.0f),  
+		glm::vec3(2.0f, 2.0f, 0.0f), 
+		glm::vec3(2.0f, 2.0f, -1.0f),  
+		glm::vec3(2.0f, 2.0f, -2.0f),
+		glm::vec3(1.0f, 2.0f, -2.0f), 
+		glm::vec3(0.0f, 2.0f, -2.0f), 
+		glm::vec3(-1.0f, 2.0f, -2.0f), 
+		glm::vec3(-2.0f, 2.0f, -2.0f),
+		glm::vec3(-2.0f, 2.0f, -1.0f), 
+		glm::vec3(-2.0f, 2.0f, 0.0f), 
+		glm::vec3(-2.0f, 2.0f, 1.0f), 
+		glm::vec3(-2.0f, 2.0f, 2.0f),
+		glm::vec3(-2.0f, 1.0f, 2.0f), 
+		glm::vec3(-2.0f, 0.0f, 2.0f), 
+		glm::vec3(-2.0f, -1.0f, 2.0f), 
+		glm::vec3(-2.0f, -2.0f, 2.0f),
+		glm::vec3(-1.0f, -2.0f, 2.0f), 
+		glm::vec3(0.0f, -2.0f, 2.0f), 
+		glm::vec3(1.0f, -2.0f, 2.0f), 
+		glm::vec3(2.0f, -2.0f, 2.0f),
+		glm::vec3(2.0f, -2.0f, 1.0f), 
+		glm::vec3(2.0f, -2.0f, 0.0f), 
+		glm::vec3(2.0f, -2.0f, -1.0f), 
+		glm::vec3(2.0f, -2.0f, -2.0f),
+		glm::vec3(1.0f, -2.0f, -2.0f), 
+		glm::vec3(0.0f, -2.0f, -2.0f), 
+		glm::vec3(-1.0f, -2.0f, -2.0f), 
+		glm::vec3(-2.0f, -2.0f, -2.0f),
+		glm::vec3(-2.0f, -2.0f, -1.0f), 
+		glm::vec3(-2.0f, -2.0f, 0.0f), 
+		glm::vec3(-1.0f, -2.0f, 0.0f), 
+		glm::vec3(-0.0f, -2.0f, 0.0f),
+
+	}
 };
 
 // initial configuration scale of model cubes
@@ -196,6 +257,7 @@ static vector<glm::mat4> modelScale
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
+	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f))
 };
 
 // initial configuration position of model (to align with hole)
@@ -203,5 +265,6 @@ static vector<glm::vec3> modelPosition =
 {
 	glm::vec3(0.0f, 5.0f, 10.0f),
 	glm::vec3(-8.0f, 20.0f, 10.0f),
-	glm::vec3(0.0f, 17.2f, 10.0f)
+	glm::vec3(0.0f, 17.2f, 10.0f),
+	glm::vec3(0.0f, 15.0f, 10.0f)
 };

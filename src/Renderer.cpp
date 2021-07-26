@@ -114,28 +114,36 @@ void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 }
 
 // Renderer for drawing the static models and walls at the corners of the map
-void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
+void Renderer::drawStaticObjects(VertexArray& va, Shader& shader)
+{
 	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
 
 	// Getting the index for drawing the models in the appropriate position
 	int index = this->renderIndex;
-	vector<vector<int>> staticPositions = { {2,1},{0,2},{0,1} };
+	vector<vector<int>> staticPositions = { {3, 2, 1}, {0, 2, 3}, {0, 3, 1}, {0, 1, 2} };
 	vector<int> staticVector = staticPositions.at(renderIndex);
 
 	// Translation to put non-centered models
+	//
+
 	glm::mat4 transLeftCorner = glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, -30.0f));
 	glm::mat4 transRightCorner = glm::translate(glm::mat4(1.0f), glm::vec3(30.0f, 0.0f, -30.0f));
+	glm::mat4 transMiddle = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -30.0f));
+
 	glm::mat4 corner = transLeftCorner;
 
 	//draw objects
-	for (int i = 0; i < staticPositions.at(renderIndex).size(); i++) {
+	for (int i = 0; i < staticPositions.at(renderIndex).size(); i++)
+	{
+
 		int positionIndex = staticVector.at(i);
 
 		// drawing all the cubes for the associated object at index i
 		int numCubePieces = modelCubePositions.at(positionIndex).size();
-		for (int i = 0; i < numCubePieces; i++) {
+		for (int i = 0; i < numCubePieces; i++)
+		{
 			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(positionIndex));
 			glm::mat4 modelCubePos = glm::translate(glm::mat4(1.0f), modelCubePositions.at(positionIndex).at(i));
 
@@ -143,30 +151,40 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader) {
 			shader.setUniform4Mat("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		corner = transRightCorner;
+		if (corner == transLeftCorner)
+		{
+			corner = transRightCorner;
+		}
+		else
+			corner = transMiddle;
 	}
 
 	//draw walls
 	corner = transLeftCorner;
-	for (int i = 0; i < staticPositions.at(renderIndex).size(); i++) {
+	for (int i = 0; i < staticPositions.at(renderIndex).size(); i++)
+	{
+
 		int positionIndex = staticVector.at(i);
 		int numWallPieces = wallCubePositions.at(positionIndex).size();
 
 		// drawing all the wall cubes for the associated object at index i
-		for (int i = 0; i < numWallPieces; i++){
+		for (int i = 0; i < numWallPieces; i++)
+		{
 			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(positionIndex));
-			glm::mat4 model = glm::mat4(1.0f)
-				* initialPos
-				* corner
-				* glm::translate(glm::mat4(1.0f), wallCubePositions.at(positionIndex).at(i))
-				* glm::scale(glm::mat4(1.0f), wallScales.at(positionIndex).at(i));
-			
+			glm::mat4 model = glm::mat4(1.0f) * initialPos * corner * glm::translate(glm::mat4(1.0f), wallCubePositions.at(positionIndex).at(i)) * glm::scale(glm::mat4(1.0f), wallScales.at(positionIndex).at(i));
+
 			shader.setUniform4Mat("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
-		corner = transRightCorner;
+		if (corner == transLeftCorner)
+		{
+			corner = transRightCorner;
+		}
+		else
+			corner = transMiddle;
 	}
 }
+
 
 // Draw the model that is currently in use
 void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement) 
