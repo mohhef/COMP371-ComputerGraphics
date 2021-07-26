@@ -22,6 +22,7 @@ private:
 	bool combinedRot = false;
 	static Renderer s_Instance;
 	Renderer();
+
 public:
 	static Renderer& getInstance();
 	Renderer(const Renderer&) = delete;
@@ -33,8 +34,10 @@ public:
 	void clear() const;
 	void drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection);
 	void drawLightingSource(VertexArray& va, Shader& shader, glm::vec3 lightPos, glm::mat4 view, glm::mat4 projection);
-	void drawStaticObjects(VertexArray& va, Shader& shader);
-	void drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> moddelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement);
-	void drawWall(VertexArray & va, Shader & shader, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement);
+	void drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos);
+	void drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> moddelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos);
+	void drawWall(VertexArray & va, Shader & shader, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, unsigned int textureID);
 	void drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, float scaleFactor);
+
+	void drawTexture(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, unsigned int textureID);
 };
