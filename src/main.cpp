@@ -50,11 +50,12 @@ void resetRotMat();
 void resetModel();
 void processInput(GLFWwindow* window, int key, int scancode, int action, int mode);
 void processMouse(GLFWwindow* window, double xpos, double  ypos);
-void createModel();
+void createModel(vector<vector<int>> model);
 void shuffleModel();
 unsigned int loadTexture(char const* path);
 
-int m1[5][5] = {
+vector<vector<int>> model1 =
+{
 	{0, 0, 0, 0, 0},
 	{0, 0, 1, 2, 0},
 	{0, 1, 0, 0, 0},
@@ -67,7 +68,7 @@ vector<vector<glm::vec3>> wallPoss;
 // main function
 int main(int argc, char* argv[])
 {
-	createModel();
+	createModel(model1);
 	GLFWwindow* window = initializeWindow();
 	{
 		// Setup for models
@@ -443,23 +444,23 @@ void processMouse(GLFWwindow* window, double xpos, double  ypos)
 }
 
 
-void createModel() {
-	int rows = sizeof(m1) / sizeof(*m1);
-	int cols = sizeof(*m1) / sizeof(**m1);
+void createModel(vector<vector<int>> model) {
+	int rows = model.size();
+	int cols = model.at(0).size();
 	vector<glm::vec3> wallPos;
 	vector<glm::vec3> modelPos;
 	float z = -10.0f;
 	for (int i = rows-1; i > -1; i--) {
 		for (int j = 0; j < cols; j++) {
-			if (m1[i][j] == 0) {
+			if (model.at(i).at(j) == 0) {
 				wallPos.push_back(glm::vec3(float(j), float(abs(i - (rows - 1))), float(z)));
 			}
 			else {
 				int multiplyer = 1.0f;
-				if (m1[i][j] < 0) {
+				if (model.at(i).at(j) < 0) {
 					multiplyer = -1.0f;
 				}
-				for (int zStack = 0; zStack < abs(m1[i][j]); zStack++) {
+				for (int zStack = 0; zStack < abs(model[i][j]); zStack++) {
 					modelPos.push_back(glm::vec3(float(j), float(abs(i - (rows - 1))), float(zStack * multiplyer)));
 				}
 			}
@@ -472,31 +473,31 @@ void createModel() {
 void shuffleModel() {
 	srand(time(0));
 	//Max number of cubes between 10 - 20
-	int remainingCube = rand() % 10 + 10;
-	int rows = sizeof(m1) / sizeof(*m1);
-	int cols = sizeof(*m1) / sizeof(**m1);
+	//int remainingCube = rand() % 10 + 10;
+	//int rows = sizeof(m1) / sizeof(*m1);
+	//int cols = sizeof(*m1) / sizeof(**m1);
 
-	vector<glm::vec3> modelPos;
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
-			if (m1[i][j] != 0) {
-				//for z-axis, between -3 -> +3
-				int numCube = rand() % 5 + (-2);
-				//+1 to make sure its not 0
-				int multiplyer = 1.0f;
-				if (numCube < 0) {
-					multiplyer = -1.0f;
-				}
-				for (int zStack = 0; zStack < abs(numCube); zStack++) {
-					modelPos.push_back(glm::vec3(float(j), float(abs(i - (rows - 1))), float(zStack * multiplyer)));
-				}
-				remainingCube -= numCube;
-				//max might exceed 20 since <1
-				if (remainingCube <1) {
-					break;
-				}
-			}
-		}
-	}
-	modelPoss.at(modelIndex) = modelPos;
+	//vector<glm::vec3> modelPos;
+	//for (int i = 0; i < rows; i++) {
+	//	for (int j = 0; j < cols; j++) {
+	//		if (m1[i][j] != 0) {
+	//			//for z-axis, between -3 -> +3
+	//			int numCube = rand() % 5 + (-2);
+	//			//+1 to make sure its not 0
+	//			int multiplyer = 1.0f;
+	//			if (numCube < 0) {
+	//				multiplyer = -1.0f;
+	//			}
+	//			for (int zStack = 0; zStack < abs(numCube); zStack++) {
+	//				modelPos.push_back(glm::vec3(float(j), float(abs(i - (rows - 1))), float(zStack * multiplyer)));
+	//			}
+	//			remainingCube -= numCube;
+	//			//max might exceed 20 since <1
+	//			if (remainingCube <1) {
+	//				break;
+	//			}
+	//		}
+	//	}
+	//}
+	//modelPoss.at(modelIndex) = modelPos;
 }
