@@ -243,7 +243,6 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 		{
 			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(index));
 			glm::mat4 wallCubePos = glm::translate(glm::mat4(1.0f), wallCubePositions.at(index).at(i));
-			glm::mat4 wallCubeScale = glm::scale(glm::mat4(1.0f), wallScales.at(index).at(i));
 			glm::mat4 translation = index > s_Instance.renderIndex ? corners.at(index - 1) : corners.at(index);
 
 			glm::mat4 model = glm::mat4(1.0f)

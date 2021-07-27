@@ -99,17 +99,17 @@ static vector<vector<int>> model1 =
 {
 	{0, 0, 0, 0, 0},
 	{0, 0, 1, 2, 0},
-	{0, 1, 0, 0, 0},
-	{0, 2, 1, 0, 0},
+	{0, 1, 0, 2, 0},
+	{0, 3, 0, 0, 0},
 	{0, 0, 0, 0, 0},
 };
 static vector<vector<int>> model2 =
 {
 	{0, 0, 0, 0, 0},
-	{0, 0, 1, 0, 0},
+	{0, 0, 1, 2, 0},
 	{0, 1, 1, 0, 0},
-	{0, 1, 0, 0, 0},
-	{0, 0, 1, -1, 0},
+	{0, 1, 2, 0, 0},
+	{0, 0, 0, 1, 0},
 	{0, 0, 0, 0, 0},
 };
 static vector<vector<int>> model3 =
@@ -117,7 +117,16 @@ static vector<vector<int>> model3 =
 	{0, 0, 0, 0, 0},
 	{0, 0, 1, 1, 0},
 	{0, 2, 0, -2, 0},
-	{0, 0, 3, -1, 0},
+	{0, 0, 2, 1, 0},
+	{0, 0, 0, 0, 0},
+};
+
+static vector<vector<int>> model4 =
+{
+	{0, 0, 0, 0, 0},
+	{0, 1, 1, 1, 0},
+	{0, 1, 0, 2, 0},
+	{0, 2, 0, 1, 0},
 	{0, 0, 0, 0, 0},
 };
 
@@ -147,8 +156,9 @@ static vector<glm::mat4> modelScale
 // initial configuration position of model (to align with hole)
 static vector<glm::vec3> modelPosition =
 {
-	glm::vec3(0.0f, 0.0f, 10.0f),
-	glm::vec3(0.0f, 0.0f, 10.0f),
-	glm::vec3(0.0f, 0.0f, 10.0f)
+	glm::vec3(0.0f, 1.0f, 10.0f),
+	glm::vec3(0.0f, 1.0f, 10.0f),
+	glm::vec3(0.0f, 1.0f, 10.0f),
+	glm::vec3(0.0f, 1.0f, 10.0f)
 };
 
