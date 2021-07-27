@@ -1,6 +1,5 @@
 #include <iostream>
 #include "Renderer.h"
-#include "Shader.h"
 
 // Clear openGL errors, makes it easier for debugging
 void glClearError()
@@ -115,10 +114,11 @@ void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 }
 
 // Renderer for drawing the static models and walls at the corners of the map
-void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos) {
+void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, Texture& texture, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos) {
 	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
+	texture.Bind();
 
 	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setUniform3Vec("lightPos", lightPos);
@@ -249,11 +249,12 @@ void Renderer::drawLightingSource(VertexArray& va, Shader& shader,glm::vec3 ligh
 }
 
 // Draw the wall that is currently in use
-void Renderer::drawWall(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, unsigned int textureID)
+void Renderer::drawWall(VertexArray& va, Shader& shader, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos)
 {
 	// bind the vertex array and shader
 	va.bind();
 	shader.bind();
+	texture.Bind();
 
 	// set all uniform variables
 	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -263,10 +264,6 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, vector<glm::mat4> model
 	shader.setUniform4Mat("projection", projection);
 	shader.setUniform4Mat("view", view);
 	shader.setUniform1i("textureStatus", 1);
-
-	// bind texture
-	// glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureID);
 
 	//using the same roation as the object will work 
 	if (combinedRot == true) {
@@ -296,6 +293,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, vector<glm::mat4> model
 	// unbind for easier debugging
 	va.unbind();
 	shader.unbind();
+	texture.Unbind();
 }
 
 void Renderer::drawTexture(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, unsigned int textureID)
