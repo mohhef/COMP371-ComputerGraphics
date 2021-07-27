@@ -123,7 +123,7 @@ void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::m
 	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
-	texture.Bind();
+	texture.bind();
 
 	// Setting all uniform variables
 	shader.setUniform4Mat("view", view);
@@ -145,7 +145,7 @@ void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::m
 	// unbind for easier debugging
 	va.unbind();
 	shader.unbind();
-	texture.Unbind();
+	texture.unbind();
 }
 
 // Renderer for drawing the static models and walls at the corners of the map
@@ -164,14 +164,16 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
-	textureModel.Bind();
+	textureModel.bind();
 
+	// Set uniform variables
 	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setUniform3Vec("lightPos", lightPos);
 	shader.setUniform3Vec("viewPos", cameraPos);
 	shader.setUniform4Mat("projection", projection);
 	shader.setUniform4Mat("view", view);
 
+	// Handle texture display toggle
 	if (status)
 	{
 		shader.setUniform1i("textureStatus", 1);
@@ -210,10 +212,13 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 		}
 	}
 
-	textureModel.Unbind();
-	textureWall.Bind();
+	textureModel.unbind();
+	textureWall.bind();
+
+	// Set uniform variables
 	shader.setUniform1i("shininess", 32);
 
+	// Handle texture display toggle
 	if (status)
 	{
 		shader.setUniform1i("textureStatus", 1);
@@ -253,7 +258,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 
 	va.unbind();
 	shader.unbind();
-	textureWall.Unbind();
+	textureWall.unbind();
 }
 
 // Draw the model that is currently in use
@@ -262,7 +267,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 	// Bind the vertex array and shader
 	va.bind();
 	shader.bind();
-	texture.Bind();
+	texture.bind();
 
 	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setUniform3Vec("lightPos", lightPos);
@@ -270,6 +275,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 	shader.setUniform4Mat("projection", projection);
 	shader.setUniform4Mat("view", view);
 
+	// handle texture display toggle
 	if (status)
 	{
 		shader.setUniform1i("textureStatus", 1);
@@ -305,13 +311,16 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 
 //Draw the lighting object
 void Renderer::drawLightingSource(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos) {
+	
+	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
 
+	// Set uniform variables
 	shader.setUniform4Mat("view", view);
 	shader.setUniform4Mat("projection", projection);
 
-	//adjust the light source position & scale it
+	// Adjust the light source position & scale it
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, lightPos);
 	model = glm::scale(model, glm::vec3(2.0f));
@@ -329,7 +338,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	// bind the vertex array and shader
 	va.bind();
 	shader.bind();
-	texture.Bind();
+	texture.bind();
 
 	// set all uniform variables
 	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -339,6 +348,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.setUniform4Mat("view", view);
 	shader.setUniform1i("shininess", 32);
 
+	// handle texture display toggle
 	if (status)
 	{
 		shader.setUniform1i("textureStatus", 1);
@@ -378,5 +388,5 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	// unbind for easier debugging
 	va.unbind();
 	shader.unbind();
-	texture.Unbind();
+	texture.unbind();
 }

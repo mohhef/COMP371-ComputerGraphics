@@ -33,7 +33,7 @@ uniform vec3 lightColor;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform sampler2D textureObject;
-uniform int textureStatus;
+uniform int textureStatus; // 1 indicates texture is being applied
 uniform int shininess;
 
 void main()
@@ -56,12 +56,15 @@ void main()
     vec3 specularVal = specularFactor * spec * lightColor;
 
     vec3 result;
+
     if (textureStatus == 1)
     {
+        // determine result with texture applied
         result = (ambientVal + diffuseVal + specularVal) * ourColor * texture(textureObject, Texture).rgb;
     }
     else
     {
+        // determine result without texture applied
         result = (ambientVal + diffuseVal + specularVal) * ourColor;
     }
 
