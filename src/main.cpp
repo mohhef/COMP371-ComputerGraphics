@@ -253,7 +253,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, true);
 
 	// Toggle between models (1-2-3)
-	if (key == GLFW_KEY_1 || key == GLFW_KEY_2 || key == GLFW_KEY_3) {
+	if (key == GLFW_KEY_1 || key == GLFW_KEY_2 || key == GLFW_KEY_3 || key == GLFW_KEY_4) {
 		if (key == GLFW_KEY_1) {
 			modelIndex = 0;
 			Renderer::getInstance().setRenderIndex(modelIndex);
@@ -264,6 +264,10 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		}
 		if (key == GLFW_KEY_3) {
 			modelIndex = 2;
+			Renderer::getInstance().setRenderIndex(modelIndex);
+		}
+		if (key == GLFW_KEY_4) {
+			modelIndex = 3;
 			Renderer::getInstance().setRenderIndex(modelIndex);
 		}
 		resetModel();
