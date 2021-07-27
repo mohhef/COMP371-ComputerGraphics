@@ -94,41 +94,37 @@ static float meshVertices[] = {
 	0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 	1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 };
-
-static vector<vector<int>> model1 =
+static vector<vector<vector<int>>> models = {
 {
 	{0, 0, 0, 0, 0},
 	{0, 0, 1, 2, 0},
 	{0, 1, 0, 2, 0},
 	{0, 3, 0, 0, 0},
 	{0, 0, 0, 0, 0},
-};
-static vector<vector<int>> model2 =
-{
+},{
 	{0, 0, 0, 0, 0},
 	{0, 0, 1, 2, 0},
 	{0, 1, 1, 0, 0},
 	{0, 1, 2, 0, 0},
 	{0, 0, 0, 1, 0},
 	{0, 0, 0, 0, 0},
-};
-static vector<vector<int>> model3 =
-{
-	{0, 0, 0, 0, 0},
-	{0, 0, 1, 1, 0},
-	{0, 2, 0, -2, 0},
-	{0, 0, 2, 1, 0},
-	{0, 0, 0, 0, 0},
-};
-
-static vector<vector<int>> model4 =
+},
 {
 	{0, 0, 0, 0, 0},
 	{0, 1, 1, 1, 0},
 	{0, 1, 0, 2, 0},
 	{0, 2, 0, 1, 0},
 	{0, 0, 0, 0, 0},
+},
+{
+	{ 0, 0, 0, 0, 0 },
+	{ 0, 0, 1, 1, 0 },
+	{ 0, 2, 0, -2, 0 },
+	{ 0, 0, 2, 1, 0 },
+	{ 0, 0, 0, 0, 0 },
+}
 };
+
 
 
 extern vector<vector<glm::vec3>> modelCubePositions;

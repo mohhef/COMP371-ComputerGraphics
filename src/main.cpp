@@ -64,10 +64,10 @@ vector<vector<glm::vec3>> wallCubePositions;
 // main function
 int main(int argc, char* argv[])
 {
-	createModel(model1);
-	createModel(model2);
-	createModel(model3);
-	createModel(model4);
+	//create models
+	for (auto &model : models) {
+		createModel(model);
+	}
 	GLFWwindow* window = initializeWindow();
 	{
 		// Setup for models
@@ -406,20 +406,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	// Shuffle models
 	if (key == GLFW_KEY_Y) {
-		switch(modelIndex){
-			case 0:
-				shuffleModel(model1);
-				break;
-			case 1:
-				shuffleModel(model2);
-				break;
-			case 2:
-				shuffleModel(model3);
-				break;
-			case 3:
-				shuffleModel(model4);
-				break;
-		}
+		shuffleModel(models.at(modelIndex));
 		resetModel(true);
 	}
 
@@ -519,10 +506,10 @@ void shuffleModel(vector<vector<int>> model) {
 	int remainingCube = getTotalCubes(model);
 
 	int rows = model.size();
-	int cols = model.at(0).size();
 
 	vector<glm::vec3> modelPos;
 	for (int i = rows - 1; i > -1; i--) {
+		int cols = model.at(i).size();
 		for (int j = 0; j < cols; j++) {
 			if (model.at(i).at(j) != 0) {
 				if (remainingCube == 0) {
