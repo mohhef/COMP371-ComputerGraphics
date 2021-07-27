@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include "VertexArray.h"
+#include "Texture.h"
 #include "Shader.h"
 #include "Constants.h"
 
@@ -22,6 +23,7 @@ private:
 	bool combinedRot = false;
 	static Renderer s_Instance;
 	Renderer();
+
 public:
 	static Renderer& getInstance();
 	Renderer(const Renderer&) = delete;
@@ -32,9 +34,10 @@ public:
 	// draw functions
 	void clear() const;
 	void drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection);
-	void drawLightingSource(VertexArray& va, Shader& shader, glm::vec3 lightPos, glm::mat4 view, glm::mat4 projection);
-	void drawStaticObjects(VertexArray& va, Shader& shader);
-	void drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> moddelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement);
-	void drawWall(VertexArray & va, Shader & shader, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement);
-	void drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, float scaleFactor);
+	void drawLightingSource(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos);
+	void drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel, bool status);
+	void drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, bool status);
+	void drawWall(VertexArray & va, Shader & shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, bool status);
+	void drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, float scaleFactor);
+	void drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture);
 };

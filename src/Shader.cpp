@@ -13,8 +13,6 @@ Shader::Shader(const std::string& filePath)
 	this->filePath = filePath;
 	// Creating a program source object to store the shaders at the specified file path
 	ShaderProgramSource source = parseShader(filePath);
-	std::cout << source.vertexSource << std::endl;
-	std::cout << source.fragmentSource << std::endl;
 	id = createShader(source.vertexSource, source.fragmentSource);
 
 }
@@ -41,6 +39,20 @@ unsigned int Shader::createShader(const std::string& vertexShader, const std::st
 
 	// link shaders
 	glLinkProgram(program);
+	
+	GLint program_linked;
+
+	GLCall(glGetProgramiv(program, GL_LINK_STATUS, &program_linked));
+	std::cout << "Program link status: " << program_linked << std::endl;
+	if (program_linked != GL_TRUE)
+	{
+		GLsizei log_length = 0;
+		GLchar message[1024];
+		GLCall(glGetProgramInfoLog(program, 1024, &log_length, message));
+		std::cout << "Failed to link program" << std::endl;
+		std::cout << message << std::endl;
+	}
+	
 	glValidateProgram(program);
 
 	// since they have been linked already we can delete
@@ -119,6 +131,10 @@ void Shader::unbind() const
 
 void Shader::setUniform1i(const std::string& name, int i) {
 	glUniform1i(getUniformLocation(name), i);
+}
+
+void Shader::setUniform1f(const std::string& name, float i) {
+	glUniform1f(getUniformLocation(name), i);
 }
 
 void Shader::setUniform4f(const std::string& name, float x, float y, float z, float w)

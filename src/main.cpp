@@ -8,6 +8,7 @@
 
 
 #define GLEW_STATIC 1
+#define STB_IMAGE_IMPLEMENTATION
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -16,11 +17,14 @@
 
 #include "Shader.h"
 #include "Camera.h"
+#include "Texture.h"
 
-#include "VertexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
+
+#include "Renderer.h"
 #include "Constants.h"
+#include "stb_image.h" // Reference: Lab 4 (COMP 353) and LearnOpenGL; Source: https://github.com/nothings/stb/blob/master/stb_image.h
 
 using namespace std;
 
@@ -31,12 +35,138 @@ vector<glm::mat4> modelRotMat;
 glm::vec3 displacement;
 float scaleFactor = 1.0f;
 bool combinedRot = false;
+bool textureStatus = true;
 
 // Cursor positions for mouse inputs
 float lastMouseX;
 float lastMouseY;
 
 Camera* camera = NULL;
+
+// function calls
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+GLFWwindow* initializeWindow();
+void resetTransMat();
+void resetRotMat();
+void resetModel();
+void processInput(GLFWwindow* window, int key, int scancode, int action, int mode);
+void processMouse(GLFWwindow* window, double xpos, double  ypos);
+
+// main function
+int main(int argc, char* argv[])
+{
+	GLFWwindow* window = initializeWindow();
+	{
+		// Setup for models
+		VertexArray vA;
+		VertexBuffer vB(vertices, sizeof(vertices));
+		VertexBufferLayout layout;
+		layout.push<float>(3);
+		layout.push<float>(3);
+		layout.push<float>(2);
+		vA.addBuffer(vB, layout);
+
+		// Setup for lighting
+		VertexArray vaLightingSource;
+		VertexBuffer vblightingSource(vertices, sizeof(vertices));
+		VertexBufferLayout layoutLightingSource;
+		layoutLightingSource.push<float>(3);
+		layoutLightingSource.push<float>(3);
+		layoutLightingSource.push<float>(2);
+		vaLightingSource.addBuffer(vblightingSource, layoutLightingSource);
+
+		// Setup for axes
+		VertexArray vaAxes;
+		VertexBuffer vbAxes(axesVertices, 3 * 2 * sizeof(float));
+		VertexBufferLayout layoutAxes;
+		layoutAxes.push<float>(3);
+		vaAxes.addBuffer(vbAxes, layoutAxes);
+
+		// Setup for mesh
+		VertexArray vaMesh;
+		VertexBuffer vbMesh(meshVertices, sizeof(vertices));
+		VertexBufferLayout layoutMesh;
+		layoutMesh.push<float>(3);
+		layoutMesh.push<float>(3);
+		vaMesh.addBuffer(vbMesh, layoutMesh);
+
+		// Setup for floor
+		VertexArray vaFloor;
+		VertexBuffer vbFloor(squareVertices, sizeof(squareVertices));
+		VertexBufferLayout layoutFloor;
+		layoutFloor.push<float>(3);
+		layoutFloor.push<float>(3);
+		layoutFloor.push<float>(2);
+		vaFloor.addBuffer(vbFloor, layoutFloor);
+
+		// Create shader instances
+		Shader* shader = new Shader("vertex_fragment.shader");
+		Shader* axesShader = new Shader("axes.shader");
+		Shader* lightingSourceShader = new Shader("lightingSource.shader");
+
+		// Renddering setup
+		Renderer& renderer = Renderer::getInstance();
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+
+		// Create camera instance
+		// Position: behind model, along Z-axis.
+		// Target: world origin (initially)
+		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 0.0f, 0.0f));
+
+		// Position of the light source
+		glm::vec3 lightPos(0.0, 40.0f, 20.0f);
+
+		// Initialize model matricies for each cube within each model 
+		resetModel();
+		glfwSetKeyCallback(window, processInput);
+		glfwSetCursorPosCallback(window, processMouse);
+
+		// load texture ids
+		Texture brickTexture("brick.jpg");
+		Texture tileTexture("tiles.jpg");
+		Texture metalTexture("metal.jpg");
+
+		// Entering main loop
+		while (!glfwWindowShouldClose(window))
+		{
+			// Update last frame
+			float currentFrame = glfwGetTime();
+			deltaTime = currentFrame - lastFrame;
+			lastFrame = currentFrame;
+
+			// Clear color and depth buffers
+			renderer.clear();
+
+			glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 200.0f);
+			glm::mat4 view = camera->getViewMatrix();
+
+			// Render each object (wall, model, static models, axes, and mesh floor)
+			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
+			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
+			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
+			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
+			renderer.drawAxes(vaAxes, *axesShader, view, projection);
+
+			if (textureStatus)
+				renderer.drawFloor(vaFloor, *shader, view, projection, lightPos, camera->position, tileTexture);
+			else
+				renderer.drawMesh(vaMesh, *shader, view, projection, lightPos, camera->position, scaleFactor);
+			
+			// End frame
+			glfwSwapBuffers(window);
+
+			// Detect inputs
+			glfwPollEvents();
+		}
+	}
+
+	// Shutdown GLFW
+	glfwTerminate();
+	return 0;
+}
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -257,8 +387,10 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-}
 
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+		textureStatus = !textureStatus;
+}
 
 // Function for processing mouse input
 void processMouse(GLFWwindow* window, double xpos, double  ypos)
@@ -313,116 +445,4 @@ void processMouse(GLFWwindow* window, double xpos, double  ypos)
 
 		camera->tiltCamera(yOffset);
 	}
-}
-
-int main(int argc, char* argv[])
-{
-	GLFWwindow* window = initializeWindow();
-	{
-		// Setup for models
-		VertexArray vA;
-		VertexBuffer vB(vertices, sizeof(vertices));
-		VertexBufferLayout layout;
-    
-		layout.push<float>(3);
-		layout.push<float>(3);
-		vA.addBuffer(vB, layout);
-
-		// Setup for lighting
-		VertexArray vaLightingSource;
-		VertexBuffer vblightingSource(vertices, sizeof(vertices));
-		VertexBufferLayout layoutLightingSource;
-		layoutLightingSource.push<float>(3);
-		layoutLightingSource.push<float>(3);
-		vaLightingSource.addBuffer(vblightingSource, layoutLightingSource);
-
-		// Setup for axes
-		VertexArray vaAxes;
-		VertexBuffer vbAxes(axesVertices, 3 * 2 * sizeof(float));
-		VertexBufferLayout layoutAxes;
-		layoutAxes.push<float>(3);
-		vaAxes.addBuffer(vbAxes, layoutAxes);
-
-		// Setup for mesh
-		VertexArray vaMesh;
-		VertexBuffer vbMesh(meshVertices, 3 * 2 * sizeof(float));
-		VertexBufferLayout layoutMesh;
-		layoutMesh.push<float>(3);
-		vaMesh.addBuffer(vbMesh, layoutMesh);
-
-		// Create shader instances
-		Shader* shader = new Shader("vertex_fragment.shader");
-		Shader* axesShader = new Shader("axes.shader");
-		Shader* meshShader = new Shader("axes.shader");
-		Shader* lightingSourceShader = new Shader("lightingSource.shader");
-
-		Renderer& renderer = Renderer::getInstance();
-
-		// Renddering setup
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LESS);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-		// Create camera instance
-		// Position: behind model, along Z-axis.
-		// Target: world origin (initially)
-		camera = new Camera(glm::vec3(modelPosition.at(modelIndex).x, modelPosition.at(modelIndex).y, 100.0f),
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(0.0f, 0.0f, 0.0f));
-
-		// Position of the light source
-		glm::vec3 lightPos(0.0, 40.0f, 20.0f);
-
-		// Initialize model matricies for each cube within each model 
-		resetModel();
-		glfwSetKeyCallback(window, processInput);
-		glfwSetCursorPosCallback(window, processMouse);
-
-		// Entering main loop
-		while (!glfwWindowShouldClose(window))
-		{
-			// Update last frame
-			float currentFrame = glfwGetTime();
-			deltaTime = currentFrame - lastFrame;
-			lastFrame = currentFrame;
-
-			// Clear color and depth buffers
-			renderer.clear();
-      
-			shader->bind();
-			vA.bind();
-			vB.bind();
-
-			shader->setUniform3Vec("ourColor", glm::vec3(1.0f, 0.5f, 0.31f));
-			shader->setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-			shader->setUniform3Vec("lightPos", lightPos);
-			shader->setUniform3Vec("viewPos", camera->position);
-
-			// Update projection matrix and pass to shader
-			glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 200.0f);
-			shader->setUniform4Mat("projection", projection);
-
-			// Update view matrix and pass to shader
-			glm::mat4 view = camera->getViewMatrix();
-			shader->setUniform4Mat("view", view);
-
-			// Render each object (wall, model, static models, axes, and mesh floor)
-			renderer.drawWall(vA, *shader,modelRotMat, scaleFactor, displacement);
-			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader,lightPos, view, projection);
-			renderer.drawObject(vA, *shader, modelRotMat, modelTransMat, scaleFactor, displacement);
-			renderer.drawStaticObjects(vA, *shader);
-			renderer.drawAxes(vaAxes, *axesShader, view, projection);
-			renderer.drawMesh(vaMesh, *meshShader, view, projection, scaleFactor);
-
-			// End frame
-			glfwSwapBuffers(window);
-
-			// Detect inputs
-			glfwPollEvents();
-		}
-	}
-
-	// Shutdown GLFW
-	glfwTerminate();
-	return 0;
 }
