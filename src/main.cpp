@@ -21,9 +21,9 @@
 
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
+#include "Constants.h"
 
 #include "Renderer.h"
-#include "Constants.h"
 #include "stb_image.h" // Reference: Lab 4 (COMP 353) and LearnOpenGL; Source: https://github.com/nothings/stb/blob/master/stb_image.h
 
 using namespace std;
@@ -47,14 +47,27 @@ Camera* camera = NULL;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 GLFWwindow* initializeWindow();
 void resetTransMat();
-void resetRotMat();
-void resetModel();
+void resetRotMat(bool randomRot= false);
+void resetModel(bool randomRot=false);
 void processInput(GLFWwindow* window, int key, int scancode, int action, int mode);
 void processMouse(GLFWwindow* window, double xpos, double  ypos);
+void createModel(vector<vector<int>> model);
+void shuffleModel(vector<vector<int>> model);
+void randomRotation();
+int getTotalCubes(vector <vector<int>> model);
+unsigned int loadTexture(char const* path);
+
+
+vector<vector<glm::vec3>> modelCubePositions;
+vector<vector<glm::vec3>> wallCubePositions;
 
 // main function
 int main(int argc, char* argv[])
 {
+	//create models
+	for (auto &model : models) {
+		createModel(model);
+	}
 	GLFWwindow* window = initializeWindow();
 	{
 		// Setup for models
@@ -223,19 +236,22 @@ void resetTransMat()
 }
 
 // Reset model's rotation matrix.
-void resetRotMat()
+void resetRotMat(bool randomRot)
 {
-	Renderer::getInstance().setRenderCombinedRot(true);
 	modelRotMat.resize(modelCubePositions.at(modelIndex).size());
 	for (int i = 0; i < modelCubePositions.at(modelIndex).size(); i++)
 		modelRotMat.at(i) = glm::mat4(1.0f);
+
+	if (randomRot) {
+		randomRotation();
+	}
 }
 
 // Reset model to initial position
-void resetModel()
+void resetModel(bool randomRot)
 {
 	resetTransMat();
-	resetRotMat();
+	resetRotMat(randomRot);
 	glfwSetTime(0.0f);
 	displacement = glm::vec3();
 	scaleFactor = 1.0f;
@@ -388,6 +404,12 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	// Shuffle models
+	if (key == GLFW_KEY_Y) {
+		shuffleModel(models.at(modelIndex));
+		resetModel(true);
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 		textureStatus = !textureStatus;
 }
@@ -445,4 +467,107 @@ void processMouse(GLFWwindow* window, double xpos, double  ypos)
 
 		camera->tiltCamera(yOffset);
 	}
+}
+
+
+void createModel(vector<vector<int>> model) {
+	int rows = model.size();
+	vector<glm::vec3> wallPos;
+	vector<glm::vec3> modelPos;
+	float z = -10.0f;
+	//start from bottom left
+	for (int i = rows-1; i > -1; i--) {
+		int cols = model.at(i).size();
+		for (int j = 0; j < cols; j++) {
+			if (model.at(i).at(j) == 0) {
+				//if 0 then wall cube
+				wallPos.push_back(glm::vec3(float(j), float(abs(i - (rows - 1))), float(z)));
+			}
+			else {
+				//if +ve the stack along +ve Z axis, otherwise +ve z
+				int multiplyer = 1.0f;
+				if (model.at(i).at(j) < 0) {
+					multiplyer = -1.0f;
+				}
+				//stack cubes along z axis
+				for (int zStack = 0; zStack < abs(model[i][j]); zStack++) {
+					modelPos.push_back(glm::vec3(float(j), float(abs(i - (rows - 1))), float(zStack * multiplyer)));
+				}
+			}
+		}
+	}
+	modelCubePositions.push_back(modelPos);
+	wallCubePositions.push_back(wallPos);
+};
+
+void shuffleModel(vector<vector<int>> model) {
+	srand(time(0));
+	//Max number of cubes
+	int remainingCube = getTotalCubes(model);
+
+	int rows = model.size();
+
+	vector<glm::vec3> modelPos;
+	for (int i = rows - 1; i > -1; i--) {
+		int cols = model.at(i).size();
+		for (int j = 0; j < cols; j++) {
+			if (model.at(i).at(j) != 0) {
+				if (remainingCube == 0) {
+					break;
+				}
+				//for z-axis, between -3 -> +3
+				int numCube = 0;
+				while (numCube == 0) {
+					numCube = rand() % 7 + (-3);
+					if (abs(numCube) > remainingCube) {
+						numCube = remainingCube;
+					}
+				}
+				remainingCube -= abs(numCube);
+
+				//if -ve z or +ve z axis
+				int multiplyer = 1.0f;
+				if (numCube < 0) {
+					multiplyer = -1.0f;
+				}
+				// stack the cubes along z
+				for (int zStack = 0; zStack < abs(numCube); zStack++) {
+					modelPos.push_back(glm::vec3(float(j), float(abs(i - (rows - 1))), float(zStack * multiplyer)));
+				}
+			}
+		}
+	}
+
+	modelCubePositions.at(modelIndex) = modelPos;
+}
+
+//rotate a model randomly when shuffling
+void randomRotation() {
+	glm::mat4 randRotMat = glm::mat4(1.0f);
+	//random rotation angle from -100 -> 100, multiple of 10
+	float rotAng = (rand() % 21 + (-10)) * 10;
+	//random x rotation
+	randRotMat = glm::rotate(randRotMat, glm::radians(rotAng), glm::vec3(1.0f, 0.0f, 0.0f));
+	//random y rotation
+	rotAng = rand() % 181 + (-90);
+	randRotMat = glm::rotate(randRotMat, glm::radians(rotAng), glm::vec3(0.0f, 1.0f, 0.0f));
+	//random z rotation
+	rotAng = rand() % 181 + (-90);
+	randRotMat = glm::rotate(randRotMat, glm::radians(rotAng), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	for (auto& rotMat : modelRotMat) {
+		rotMat *= randRotMat;
+	}
+	modelRotMat.at(modelIndex) = randRotMat;
+}
+
+//count the total number of cubes in a model
+int getTotalCubes(vector<vector<int>> model) {
+	int total = 0;
+	for (auto& row : model) {
+		for (auto& col : row) {
+			total += abs(col);
+		}
+	}
+	return total;
 }

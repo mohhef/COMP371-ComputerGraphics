@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Renderer.h"
+#include "Constants.h"
 
 // Clear openGL errors, makes it easier for debugging
 void glClearError()
@@ -240,16 +241,15 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 		int numWallPieces = wallCubePositions.at(index).size();
 		for (int i = 0; i < numWallPieces; i++) 
 		{
-			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(index));
+			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(index));
 			glm::mat4 wallCubePos = glm::translate(glm::mat4(1.0f), wallCubePositions.at(index).at(i));
-			glm::mat4 wallCubeScale = glm::scale(glm::mat4(1.0f), wallScales.at(index).at(i));
 			glm::mat4 translation = index > s_Instance.renderIndex ? corners.at(index - 1) : corners.at(index);
 
 			glm::mat4 model = glm::mat4(1.0f)
 				* initialPos
 				* translation
-				* wallCubePos
-				* wallCubeScale;
+				* modelScale.at(renderIndex)
+				* wallCubePos;
 
 			shader.setUniform4Mat("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -370,7 +370,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	{
 		// calculate model matrix for each object and pass it to shader before drawing
 		glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(displacement.x, 0.0f, 0.0f));
-		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(renderIndex));
+		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(renderIndex));
 
 		// unit matrix * wall_scale * x_translation * wall_translation (align with XZ plane) * wall_cube_scale * wall_cube_translate
 		glm::mat4 model = glm::mat4(1.0f)
@@ -378,8 +378,8 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 			* trans
 			* initialPos
 			* rotationMatrix
-			* glm::translate(glm::mat4(1.0f), wallCubePositions.at(renderIndex).at(i))
-			* glm::scale(glm::mat4(1.0f), wallScales.at(renderIndex).at(i));
+			* modelScale.at(renderIndex)
+			* glm::translate(glm::mat4(1.0f), wallCubePositions.at(renderIndex).at(i));
 
 		shader.setUniform4Mat("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
