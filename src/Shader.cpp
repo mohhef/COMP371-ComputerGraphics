@@ -41,6 +41,20 @@ unsigned int Shader::createShader(const std::string& vertexShader, const std::st
 
 	// link shaders
 	glLinkProgram(program);
+	
+	GLint program_linked;
+
+	GLCall(glGetProgramiv(program, GL_LINK_STATUS, &program_linked));
+	std::cout << "Program link status: " << program_linked << std::endl;
+	if (program_linked != GL_TRUE)
+	{
+		GLsizei log_length = 0;
+		GLchar message[1024];
+		GLCall(glGetProgramInfoLog(program, 1024, &log_length, message));
+		std::cout << "Failed to link program" << std::endl;
+		std::cout << message << std::endl;
+	}
+	
 	glValidateProgram(program);
 
 	// since they have been linked already we can delete

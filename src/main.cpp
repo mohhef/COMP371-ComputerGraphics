@@ -17,9 +17,12 @@
 
 #include "Shader.h"
 #include "Camera.h"
-#include "VertexBuffer.h"
+#include "Texture.h"
+
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
+
+#include "Renderer.h"
 #include "Constants.h"
 #include "stb_image.h" // Reference: Lab 4 (COMP 353) and LearnOpenGL; Source: https://github.com/nothings/stb/blob/master/stb_image.h
 
@@ -113,8 +116,7 @@ int main(int argc, char* argv[])
 		glfwSetCursorPosCallback(window, processMouse);
 
 		// load texture ids
-		unsigned int brickTextureID = loadTexture(".\\brick.jpg");
-		unsigned int tileTextureID = loadTexture(".\\tiles.jpg");
+		Texture brickTexture("brick.jpg");
 
 		// Entering main loop
 		while (!glfwWindowShouldClose(window))
@@ -132,8 +134,8 @@ int main(int argc, char* argv[])
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
 			renderer.drawObject(vA, *shader, modelRotMat, modelTransMat, scaleFactor, displacement, view, projection, lightPos, camera->position);
-			renderer.drawWall(vA, *shader, modelRotMat, scaleFactor, displacement, view, projection, lightPos, camera->position, brickTextureID);
-			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position);
+			renderer.drawWall(vA, *shader, brickTexture, modelRotMat, scaleFactor, displacement, view, projection, lightPos, camera->position);
+			renderer.drawStaticObjects(vA, *shader, brickTexture, view, projection, lightPos, camera->position);
 			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, lightPos, view, projection);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
 			renderer.drawMesh(vaMesh, *meshShader, view, projection, scaleFactor);
@@ -421,46 +423,4 @@ void processMouse(GLFWwindow* window, double xpos, double  ypos)
 
 		camera->tiltCamera(yOffset);
 	}
-}
-
-// Reference: Lab 4 (COMP 353) and LearnOpenGL
-unsigned int loadTexture(char const* path)
-{
-	// step 1: create and bind textures
-	unsigned int id;
-	glGenTextures(1, &id);
-	glBindTexture(GL_TEXTURE_2D, id);
-
-	// step 2: filter paramaters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
-	// step 3: load textures
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
-	if (!data)
-	{
-		cout << "Texture failed to load at path: " << path << endl;
-		stbi_image_free(data);
-	}
-
-	// step 4: upload texture to GPU
-	GLenum format;
-	if (nrChannels == 1)
-		format = GL_RED;
-	else if (nrChannels == 3)
-		format = GL_RGB;
-	else if (nrChannels == 4)
-		format = GL_RGBA;
-
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	// step 5: free all resources
-	stbi_image_free(data);
-
-	return id;
 }
