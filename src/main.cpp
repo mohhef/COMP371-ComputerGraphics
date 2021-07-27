@@ -101,7 +101,6 @@ int main(int argc, char* argv[])
 
 		// Create shader instances
 		Shader* shader = new Shader("vertex_fragment.shader");
-		Shader* modelShader = new Shader("custom_material.shader");
 		Shader* axesShader = new Shader("axes.shader");
 		Shader* lightingSourceShader = new Shader("lightingSource.shader");
 
@@ -128,6 +127,7 @@ int main(int argc, char* argv[])
 		// load texture ids
 		Texture brickTexture("brick.jpg");
 		Texture tileTexture("tiles.jpg");
+		Texture metalTexture("metal.jpg");
 
 		// Entering main loop
 		while (!glfwWindowShouldClose(window))
@@ -144,9 +144,9 @@ int main(int argc, char* argv[])
 			glm::mat4 view = camera->getViewMatrix();
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
-			renderer.drawObject(vA, *modelShader, view, projection, lightPos, camera->position, modelRotMat, modelTransMat, scaleFactor, displacement);
+			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
 			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
-			renderer.drawStaticObjects(vA, *shader, *modelShader, view, projection, lightPos, camera->position, brickTexture, textureStatus);
+			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
 			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
 
