@@ -67,6 +67,19 @@ static float vertices[] =
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
 };
 
+// Verticies for the floor (for texture)
+// Position(f,f,f) Normal(f,f,f) Texture(f,f)
+static float squareVertices[] =
+{
+	-0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+	0.5f,  0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+	-0.5f, 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+	-0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+	0.5f,  0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+	0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f
+	
+};
+
 // Vertices for a line which is used by the axes
 static float axesVertices[] =
 {
@@ -75,9 +88,10 @@ static float axesVertices[] =
 };
 
 // Vertices for a line which is used by the mesh
+// Position(f,f,f) Normal(f,f,f) 
 static float meshVertices[] = {
-	0.0f, 0.0f, 0.0f,
-	1.0f, 0.0f, 0.0f
+	0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+	1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 };
 
 // initial configuration of cubes for wall

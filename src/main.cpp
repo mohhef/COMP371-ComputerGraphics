@@ -35,6 +35,7 @@ vector<glm::mat4> modelRotMat;
 glm::vec3 displacement;
 float scaleFactor = 1.0f;
 bool combinedRot = false;
+bool textureStatus = true;
 
 // Cursor positions for mouse inputs
 float lastMouseX;
@@ -50,7 +51,6 @@ void resetRotMat();
 void resetModel();
 void processInput(GLFWwindow* window, int key, int scancode, int action, int mode);
 void processMouse(GLFWwindow* window, double xpos, double  ypos);
-unsigned int loadTexture(char const* path);
 
 // main function
 int main(int argc, char* argv[])
@@ -84,15 +84,24 @@ int main(int argc, char* argv[])
 
 		// Setup for mesh
 		VertexArray vaMesh;
-		VertexBuffer vbMesh(meshVertices, 3 * 2 * sizeof(float));
+		VertexBuffer vbMesh(meshVertices, sizeof(vertices));
 		VertexBufferLayout layoutMesh;
 		layoutMesh.push<float>(3);
+		layoutMesh.push<float>(3);
 		vaMesh.addBuffer(vbMesh, layoutMesh);
+
+		// Setup for floor
+		VertexArray vaFloor;
+		VertexBuffer vbFloor(squareVertices, sizeof(squareVertices));
+		VertexBufferLayout layoutFloor;
+		layoutFloor.push<float>(3);
+		layoutFloor.push<float>(3);
+		layoutFloor.push<float>(2);
+		vaFloor.addBuffer(vbFloor, layoutFloor);
 
 		// Create shader instances
 		Shader* shader = new Shader("vertex_fragment.shader");
 		Shader* axesShader = new Shader("axes.shader");
-		Shader* meshShader = new Shader("axes.shader");
 		Shader* lightingSourceShader = new Shader("lightingSource.shader");
 
 		// Renddering setup
@@ -117,6 +126,7 @@ int main(int argc, char* argv[])
 
 		// load texture ids
 		Texture brickTexture("brick.jpg");
+		Texture tileTexture("tiles.jpg");
 
 		// Entering main loop
 		while (!glfwWindowShouldClose(window))
@@ -133,13 +143,17 @@ int main(int argc, char* argv[])
 			glm::mat4 view = camera->getViewMatrix();
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
-			renderer.drawObject(vA, *shader, modelRotMat, modelTransMat, scaleFactor, displacement, view, projection, lightPos, camera->position);
-			renderer.drawWall(vA, *shader, brickTexture, modelRotMat, scaleFactor, displacement, view, projection, lightPos, camera->position);
-			renderer.drawStaticObjects(vA, *shader, brickTexture, view, projection, lightPos, camera->position);
-			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, lightPos, view, projection);
+			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, modelRotMat, modelTransMat, scaleFactor, displacement);
+			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
+			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, textureStatus);
+			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
-			renderer.drawMesh(vaMesh, *meshShader, view, projection, scaleFactor);
 
+			if (textureStatus)
+				renderer.drawFloor(vaFloor, *shader, view, projection, lightPos, camera->position, tileTexture);
+			else
+				renderer.drawMesh(vaMesh, *shader, view, projection, lightPos, camera->position, scaleFactor);
+			
 			// End frame
 			glfwSwapBuffers(window);
 
@@ -368,6 +382,9 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+		textureStatus = !textureStatus;
 }
 
 // Function for processing mouse input
