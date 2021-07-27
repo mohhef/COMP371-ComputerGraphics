@@ -15,6 +15,7 @@
 void glClearError();
 bool glLogCall(const char* function, const char* file, int line);
 
+
 class Renderer
 {
 private:

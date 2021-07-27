@@ -21,6 +21,8 @@ static float lastX = WIDTH / 2;
 static float lastY = HEIGHT / 2;
 static bool initialMousePos = true;
 
+
+
 //Position(f,f,f) Normal(f,f,f) Texture(f,f)
 static float vertices[] =
 {
@@ -142,6 +144,9 @@ static vector<vector<glm::vec3>> wallScales =
 	},
 };
 
+extern vector<vector<glm::vec3>> modelPoss;
+extern vector<vector<glm::vec3>> wallPoss;
+
 // initial configuration position of wall (to align with XZ plane)
 static vector<glm::vec3> wallPosition =
 {
@@ -201,7 +206,8 @@ static vector<glm::mat4> modelScale
 // initial configuration position of model (to align with hole)
 static vector<glm::vec3> modelPosition =
 {
-	glm::vec3(0.0f, 5.0f, 10.0f),
+	glm::vec3(0.0f, 0.0f, 10.0f),
 	glm::vec3(-8.0f, 20.0f, 10.0f),
 	glm::vec3(0.0f, 17.2f, 10.0f)
 };
+
