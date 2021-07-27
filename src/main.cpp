@@ -472,12 +472,12 @@ void processMouse(GLFWwindow* window, double xpos, double  ypos)
 
 void createModel(vector<vector<int>> model) {
 	int rows = model.size();
-	int cols = model.at(0).size();
 	vector<glm::vec3> wallPos;
 	vector<glm::vec3> modelPos;
 	float z = -10.0f;
 	//start from bottom left
 	for (int i = rows-1; i > -1; i--) {
+		int cols = model.at(i).size();
 		for (int j = 0; j < cols; j++) {
 			if (model.at(i).at(j) == 0) {
 				//if 0 then wall cube
