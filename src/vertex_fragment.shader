@@ -58,7 +58,7 @@ void main()
     vec3 result;
     if (textureStatus == 1)
     {
-        result = (ambientVal + diffuseVal + specularVal) * texture(textureObject, Texture).rgb;
+        result = (ambientVal + diffuseVal + specularVal) * ourColor * texture(textureObject, Texture).rgb;
     }
     else
     {
