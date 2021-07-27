@@ -13,8 +13,6 @@ Shader::Shader(const std::string& filePath)
 	this->filePath = filePath;
 	// Creating a program source object to store the shaders at the specified file path
 	ShaderProgramSource source = parseShader(filePath);
-	// std::cout << source.vertexSource << std::endl;
-	// std::cout << source.fragmentSource << std::endl;
 	id = createShader(source.vertexSource, source.fragmentSource);
 
 }
@@ -133,6 +131,10 @@ void Shader::unbind() const
 
 void Shader::setUniform1i(const std::string& name, int i) {
 	glUniform1i(getUniformLocation(name), i);
+}
+
+void Shader::setUniform1f(const std::string& name, float i) {
+	glUniform1f(getUniformLocation(name), i);
 }
 
 void Shader::setUniform4f(const std::string& name, float x, float y, float z, float w)

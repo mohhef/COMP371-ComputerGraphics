@@ -2,19 +2,21 @@
 #include <iostream>
 using namespace std;
 
-
-class Texture {
+class Texture 
+{
 public:
 	Texture(const std::string& path);
 	~Texture();
-	void Bind(unsigned int slot = 0) const;
-	void Unbind() const;
+	
+	void bind(unsigned int slot = 0) const;
+	void unbind() const;
 
-	inline int getWidth() const { return width; }
-	inline int getHeight() const { return height; }
+	inline int getWidth() const { return width; };
+	inline int getHeight() const { return height; };
+
 private:
-	unsigned int id;
-	std::string filePath;
-	unsigned char* localBuffer;
-	int width, height, nrChannels;
+	unsigned int id; // texture id
+	string filePath; // file path to texture
+	unsigned char* data; // holds all data
+	int width, height, nrChannels; 
 };

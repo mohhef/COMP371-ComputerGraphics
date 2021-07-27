@@ -69,6 +69,18 @@ static float vertices[] =
 		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
 };
 
+// Verticies for the floor (for texture)
+// Position(f,f,f) Normal(f,f,f) Texture(f,f)
+static float squareVertices[] =
+{
+	-0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+	0.5f,  0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+	-0.5f, 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+	-0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+	0.5f,  0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+	0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f
+};
+
 // Vertices for a line which is used by the axes
 static float axesVertices[] =
 {
@@ -77,9 +89,10 @@ static float axesVertices[] =
 };
 
 // Vertices for a line which is used by the mesh
+// Position(f,f,f) Normal(f,f,f) 
 static float meshVertices[] = {
-	0.0f, 0.0f, 0.0f,
-	1.0f, 0.0f, 0.0f
+	0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+	1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
 };
 
 static vector<vector<int>> model1 =
@@ -118,6 +131,7 @@ static vector<glm::vec3> wallPosition =
 	glm::vec3(0.0f, 1.0f, 10.0f),
 	glm::vec3(0.0f, 7.5f, 10.0f),
 	glm::vec3(0.0f, 4.7f, 10.0f),
+	glm::vec3(0.0f, 5.0f, 0.0f)
 };
 
 
@@ -127,6 +141,7 @@ static vector<glm::mat4> modelScale
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
+	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f))
 };
 
 // initial configuration position of model (to align with hole)

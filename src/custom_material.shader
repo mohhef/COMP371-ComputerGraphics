@@ -28,45 +28,45 @@ in vec3 Normal;
 in vec3 FragPos;
 in vec2 Texture;
 
-uniform vec3 ourColor;
-uniform vec3 lightColor;
+struct Material 
+{
+    float shiny;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
+struct Light 
+{
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
 uniform vec3 lightPos;
 uniform vec3 viewPos;
-uniform sampler2D textureObject;
-uniform int textureStatus; // 1 indicates texture is being applied
-uniform int shininess;
+
+uniform Material material;
+uniform Light light;
 
 void main()
 {
     //ambient
-    float ambientFactor = 0.1;
-    vec3 ambientVal = ambientFactor * lightColor;
+    vec3 ambientVal = light.ambient * material.ambient;
 
     // diffuse 
     vec3 norm = normalize(Normal);
-    vec3 lightDirection = normalize(lightPos - FragPos);
+    vec3 lightDirection = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDirection), 0.0);
-    vec3 diffuseVal = diff * lightColor;
+    vec3 diffuseVal = diff * material.diffuse * light.diffuse;
 
     // specular
-    float specularFactor = 0.5;
     vec3 viewDirection = normalize(viewPos - FragPos);
     vec3 reflectDirection = reflect(-lightDirection, norm);
-    float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), shininess);
-    vec3 specularVal = specularFactor * spec * lightColor;
+    float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), material.shiny);
+    vec3 specularVal = spec * material.specular * light.specular;
 
-    vec3 result;
-
-    if (textureStatus == 1)
-    {
-        // determine result with texture applied
-        result = (ambientVal + diffuseVal + specularVal) * ourColor * texture(textureObject, Texture).rgb;
-    }
-    else
-    {
-        // determine result without texture applied
-        result = (ambientVal + diffuseVal + specularVal) * ourColor;
-    }
-
+    vec3 result = (ambientVal + diffuseVal + specularVal);
     FragColor = vec4(result, 1.0f);
 }

@@ -76,17 +76,21 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 }
 
 // Renderer for drawing the mesh
-void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, float scaleFactor)
+void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, float scaleFactor)
 {
 	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
 
-	// Setting the appropriate materials to be viewed appropriately in 3d
+	// Setting all uniform variables
 	shader.setUniform4Mat("view", view);
 	shader.setUniform4Mat("projection", projection);
-	// Setting the material for color
-	shader.setUniform4Vec("ourColor", glm::vec4(0.5, 0.5, 0.5, 0.0f));
+	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	shader.setUniform3Vec("lightPos", lightPos);
+	shader.setUniform3Vec("viewPos", cameraPos);
+	shader.setUniform3Vec("ourColor", glm::vec3(0.5f, 0.5f, 0.5f));
+	shader.setUniform1i("textureStatus", 0);
+	shader.setUniform1i("shininess", 32);
 
 	// Materials to be used by the following for loop
 	glm::mat4 model;
@@ -114,21 +118,43 @@ void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.unbind();
 }
 
-// Renderer for drawing the static models and walls at the corners of the map
-void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, Texture& texture, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos) {
+// Renderer for drawing floor (with texture)
+void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture)
+{
 	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
-	texture.Bind();
+	texture.bind();
 
+	// Setting all uniform variables
+	shader.setUniform4Mat("view", view);
+	shader.setUniform4Mat("projection", projection);
 	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setUniform3Vec("lightPos", lightPos);
 	shader.setUniform3Vec("viewPos", cameraPos);
-	shader.setUniform4Mat("projection", projection);
-	shader.setUniform4Mat("view", view);
+	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	shader.setUniform1i("shininess", 32);
+	shader.setUniform1i("textureStatus", 1);
 
+	// scale and align with XZ plane
+	glm::mat4 model = glm::mat4(1.0f)
+		* glm::scale(glm::mat4(1.0f), glm::vec3(100.0f));
+
+	shader.setUniform4Mat("model", model);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	// unbind for easier debugging
+	va.unbind();
+	shader.unbind();
+	texture.unbind();
+}
+
+// Renderer for drawing the static models and walls at the corners of the map
+void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel, bool status) 
+{
 	// Translation to put non-centered models
-	vector<glm::mat4> corners = {
+	vector<glm::mat4> corners = 
+	{
 		glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, -30.0f)),
 		glm::translate(glm::mat4(1.0f), glm::vec3(30.0f, 0.0f, -30.0f)),
 		glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 30.0f, -30.0f)),
@@ -136,11 +162,35 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, Texture& textu
 		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 30.0f, -30.0f)),
 	};
 
-	// Draw objects
-	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 0.0f, 1.0f));
-	shader.setUniform1i("textureStatus", 0);
+	// Binding vertex array and shader
+	va.bind();
+	shader.bind();
+	textureModel.bind();
 
-	for (int index = 0; index < modelCubePositions.size(); index++) {
+	// Set uniform variables
+	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	shader.setUniform3Vec("lightPos", lightPos);
+	shader.setUniform3Vec("viewPos", cameraPos);
+	shader.setUniform4Mat("projection", projection);
+	shader.setUniform4Mat("view", view);
+
+	// Handle texture display toggle
+	if (status)
+	{
+		shader.setUniform1i("textureStatus", 1);
+		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
+		shader.setUniform1i("shininess", 16);
+	}
+	else
+	{
+		shader.setUniform1i("textureStatus", 0);
+		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
+		shader.setUniform1i("shininess", 32);
+	}
+
+	// Draw objects
+	for (int index = 0; index < modelCubePositions.size(); index++) 
+	{
 		if (index == s_Instance.renderIndex)
 			continue;
 
@@ -151,24 +201,39 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, Texture& textu
 			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(index));
 			glm::mat4 modelCubePos = glm::translate(glm::mat4(1.0f), modelCubePositions.at(index).at(i));
 			glm::mat4 modelCubeScale = modelScale.at(index);
-			glm::mat4 translation = index > modelIndex ? corners.at(index - 1) : corners.at(index);
-			glm::mat4 model = glm::mat4(1.0f) 
-				* translation 
+			glm::mat4 translation = index > s_Instance.renderIndex ? corners.at(index - 1) : corners.at(index);
+			glm::mat4 model = glm::mat4(1.0f)
+				* translation
 				* initialPos
 				* modelCubeScale
-				* modelCubePos 
-				;
+				* modelCubePos;
 
 			shader.setUniform4Mat("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
 
-	// Draw walls
-	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform1i("textureStatus", 1);
+	textureModel.unbind();
+	textureWall.bind();
 
-	for (int index = 0; index < modelCubePositions.size(); index++) {
+	// Set uniform variables
+	shader.setUniform1i("shininess", 32);
+
+	// Handle texture display toggle
+	if (status)
+	{
+		shader.setUniform1i("textureStatus", 1);
+		shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	}
+	else
+	{
+		shader.setUniform1i("textureStatus", 0);
+		shader.setUniform3Vec("ourColor", glm::vec3(0.63f, 0.63f, 0.63f));
+	}
+	
+	// Draw walls
+	for (int index = 0; index < modelCubePositions.size(); index++) 
+	{
 		if (index == s_Instance.renderIndex)
 			continue;
 
@@ -178,7 +243,8 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, Texture& textu
 		{
 			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(index));
 			glm::mat4 wallCubePos = glm::translate(glm::mat4(1.0f), wallCubePositions.at(index).at(i));
-			glm::mat4 translation = index > modelIndex ? corners.at(index - 1) : corners.at(index);
+			glm::mat4 wallCubeScale = glm::scale(glm::mat4(1.0f), wallScales.at(index).at(i));
+			glm::mat4 translation = index > s_Instance.renderIndex ? corners.at(index - 1) : corners.at(index);
 
 			glm::mat4 model = glm::mat4(1.0f)
 				* initialPos
@@ -190,24 +256,39 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, Texture& textu
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
+
+	va.unbind();
+	shader.unbind();
+	textureWall.unbind();
 }
 
 // Draw the model that is currently in use
-void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos)
+void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, bool status)
 {
 	// Bind the vertex array and shader
 	va.bind();
 	shader.bind();
+	texture.bind();
 
-	// set all uniform variables
-	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 0.0f, 1.0f));
 	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setUniform3Vec("lightPos", lightPos);
 	shader.setUniform3Vec("viewPos", cameraPos);
 	shader.setUniform4Mat("projection", projection);
 	shader.setUniform4Mat("view", view);
-	shader.setUniform1i("textureStatus", 0);
 
+	// handle texture display toggle
+	if (status)
+	{
+		shader.setUniform1i("textureStatus", 1);
+		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
+		shader.setUniform1i("shininess", 16);
+	}
+	else
+	{
+		shader.setUniform1i("textureStatus", 0);
+		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
+		shader.setUniform1i("shininess", 32);
+	}
 
 	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	float time = (float)glfwGetTime();
@@ -230,14 +311,17 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 }
 
 //Draw the lighting object
-void Renderer::drawLightingSource(VertexArray& va, Shader& shader,glm::vec3 lightPos, glm::mat4 view, glm::mat4 projection) {
+void Renderer::drawLightingSource(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos) {
+	
+	// Binding vertex array and shader
 	va.bind();
 	shader.bind();
 
+	// Set uniform variables
 	shader.setUniform4Mat("view", view);
 	shader.setUniform4Mat("projection", projection);
 
-	//adjust the light source position & scale it
+	// Adjust the light source position & scale it
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, lightPos);
 	model = glm::scale(model, glm::vec3(2.0f));
@@ -250,22 +334,33 @@ void Renderer::drawLightingSource(VertexArray& va, Shader& shader,glm::vec3 ligh
 }
 
 // Draw the wall that is currently in use
-void Renderer::drawWall(VertexArray& va, Shader& shader, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos)
+void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, bool status)
 {
 	// bind the vertex array and shader
 	va.bind();
 	shader.bind();
-	texture.Bind();
+	texture.bind();
 
 	// set all uniform variables
-	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	shader.setUniform3Vec("lightPos", lightPos);
 	shader.setUniform3Vec("viewPos", cameraPos);
 	shader.setUniform4Mat("projection", projection);
 	shader.setUniform4Mat("view", view);
-	shader.setUniform1i("textureStatus", 1);
+	shader.setUniform1i("shininess", 32);
 
+	// handle texture display toggle
+	if (status)
+	{
+		shader.setUniform1i("textureStatus", 1);
+		shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	}
+	else 
+	{
+		shader.setUniform1i("textureStatus", 0);
+		shader.setUniform3Vec("ourColor", glm::vec3(0.63f, 0.63f, 0.63f));
+	}
+	
 	//using the same roation as the object will work 
 	if (combinedRot == true) {
 		rotationMatrix = modelRotMat.at(1);
@@ -294,36 +389,5 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, Texture& texture, vecto
 	// unbind for easier debugging
 	va.unbind();
 	shader.unbind();
-	texture.Unbind();
-}
-
-void Renderer::drawTexture(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, unsigned int textureID)
-{
-	shader.bind();
-
-	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 0.5f, 1.00f));
-	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform3Vec("lightPos", lightPos);
-	shader.setUniform3Vec("viewPos", cameraPos);
-	shader.setUniform4Mat("projection", projection);
-	shader.setUniform4Mat("view", view);
-	shader.setUniform1i("textureObject", 0);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	va.bind();
-
-	glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(20.0f, 20.0f, 2.0f));
-	glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 10.0f, -20.0f));
-
-	glm::mat4 model = glm::mat4(1.0f)
-		* translate
-		* scale;
-
-	shader.setUniform4Mat("model", model);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
-
-	va.unbind();
-	shader.unbind();
+	texture.unbind();
 }
