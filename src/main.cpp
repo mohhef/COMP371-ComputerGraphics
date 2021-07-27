@@ -16,6 +16,7 @@
 
 #include "Shader.h"
 #include "Camera.h"
+#include "Texture.h"
 
 #include "VertexBuffer.h"
 #include "VertexArray.h"
@@ -322,6 +323,7 @@ int main(int argc, char* argv[])
     
 		layout.push<float>(3);
 		layout.push<float>(3);
+		layout.push<float>(2);
 		vA.addBuffer(vB, layout);
 
 		// Setup for lighting
@@ -330,6 +332,7 @@ int main(int argc, char* argv[])
 		VertexBufferLayout layoutLightingSource;
 		layoutLightingSource.push<float>(3);
 		layoutLightingSource.push<float>(3);
+		layoutLightingSource.push<float>(2);
 		vaLightingSource.addBuffer(vblightingSource, layoutLightingSource);
 
 		// Setup for axes
@@ -351,6 +354,10 @@ int main(int argc, char* argv[])
 		Shader* axesShader = new Shader("axes.shader");
 		Shader* meshShader = new Shader("axes.shader");
 		Shader* lightingSourceShader = new Shader("lightingSource.shader");
+
+		Texture texture("wall.jpg");
+		texture.Bind(0);
+
 
 		Renderer& renderer = Renderer::getInstance();
 
@@ -389,6 +396,8 @@ int main(int argc, char* argv[])
 			vA.bind();
 			vB.bind();
 
+			//has to match the bind number
+			shader->setUniform1i("textureLoc", 0);
 			shader->setUniform3Vec("ourColor", glm::vec3(1.0f, 0.5f, 0.31f));
 			shader->setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 			shader->setUniform3Vec("lightPos", lightPos);
