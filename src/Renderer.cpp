@@ -147,17 +147,9 @@ void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::m
 }
 
 // Renderer for drawing the static models and walls at the corners of the map
-void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, bool status) {
+void Renderer::drawStaticObjects(VertexArray& va, Shader& wallShader, Shader& modelShader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, bool status) {
 	// Binding vertex array and shader
 	va.bind();
-	shader.bind();
-	texture.Bind();
-
-	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform3Vec("lightPos", lightPos);
-	shader.setUniform3Vec("viewPos", cameraPos);
-	shader.setUniform4Mat("projection", projection);
-	shader.setUniform4Mat("view", view);
 
 	// Translation to put non-centered models
 	vector<glm::mat4> corners = {
@@ -169,8 +161,19 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	};
 	
 	// Draw objects
-	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 0.0f, 1.0f));
-	shader.setUniform1i("textureStatus", 0);
+	// Colors: http://devernay.free.fr/cours/opengl/materials.html
+	modelShader.bind();
+	modelShader.setUniform3Vec("viewPos", cameraPos);
+	modelShader.setUniform4Mat("projection", projection);
+	modelShader.setUniform4Mat("view", view);
+	modelShader.setUniform3Vec("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+	modelShader.setUniform3Vec("light.diffuse", glm::vec3(0.75f, 0.75f, 0.75f));
+	modelShader.setUniform3Vec("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+	modelShader.setUniform3Vec("light.position", lightPos);
+	modelShader.setUniform3Vec("material.ambient", glm::vec3(0.0215f, 0.1745f, 0.0215f));
+	modelShader.setUniform3Vec("material.diffuse", glm::vec3(0.07568f, 0.61424f, 0.07568f));
+	modelShader.setUniform3Vec("material.specular", glm::vec3(0.633f, 0.727811f, 0.633f));
+	modelShader.setUniform1f("material.shiny", 0.60f);
 
 	for (int index = 0; index < modelCubePositions.size(); index++) {
 		if (index == modelIndex)
@@ -190,21 +193,31 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 				* modelCubePos 
 				* modelCubeScale;
 
-			shader.setUniform4Mat("model", model);
+			modelShader.setUniform4Mat("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
 
 	// Draw walls
+	wallShader.bind();
+	texture.Bind();
+
+	// set all uniform variables
+	wallShader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+	wallShader.setUniform3Vec("lightPos", lightPos);
+	wallShader.setUniform3Vec("viewPos", cameraPos);
+	wallShader.setUniform4Mat("projection", projection);
+	wallShader.setUniform4Mat("view", view);
+
 	if (status)
 	{
-		shader.setUniform1i("textureStatus", 1);
-		shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		wallShader.setUniform1i("textureStatus", 1);
+		wallShader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
 	}
 	else
 	{
-		shader.setUniform1i("textureStatus", 0);
-		shader.setUniform3Vec("ourColor", glm::vec3(0.63f, 0.63f, 0.63f));
+		wallShader.setUniform1i("textureStatus", 0);
+		wallShader.setUniform3Vec("ourColor", glm::vec3(0.63f, 0.63f, 0.63f));
 	}
 
 	for (int index = 0; index < modelCubePositions.size(); index++) {
@@ -226,10 +239,15 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 				* wallCubePos
 				* wallCubeScale;
 
-			shader.setUniform4Mat("model", model);
+			wallShader.setUniform4Mat("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 	}
+
+	va.unbind();
+	modelShader.unbind();
+	wallShader.unbind();
+	texture.Unbind();
 }
 
 // Draw the model that is currently in use
@@ -239,15 +257,19 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 	va.bind();
 	shader.bind();
 
-	// set all uniform variables
-	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 0.0f, 1.0f));
-	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform3Vec("lightPos", lightPos);
+	// Set all uniform variables
+	// Colors: http://devernay.free.fr/cours/opengl/materials.html
 	shader.setUniform3Vec("viewPos", cameraPos);
 	shader.setUniform4Mat("projection", projection);
 	shader.setUniform4Mat("view", view);
-	shader.setUniform1i("textureStatus", 0);
-
+	shader.setUniform3Vec("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+	shader.setUniform3Vec("light.diffuse", glm::vec3(0.75f, 0.75f, 0.75f));
+	shader.setUniform3Vec("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+	shader.setUniform3Vec("light.position", lightPos);
+	shader.setUniform3Vec("material.ambient", glm::vec3(0.0215f, 0.1745f, 0.0215f));
+	shader.setUniform3Vec("material.diffuse", glm::vec3(0.07568f, 0.61424f, 0.07568f));
+	shader.setUniform3Vec("material.specular", glm::vec3(0.633f, 0.727811f, 0.633f));
+	shader.setUniform1f("material.shiny", 0.60f);
 
 	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	float time = (float)glfwGetTime();
