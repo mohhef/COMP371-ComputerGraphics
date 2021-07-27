@@ -175,8 +175,9 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& wallShader, Shader& mo
 	modelShader.setUniform3Vec("material.specular", glm::vec3(0.633f, 0.727811f, 0.633f));
 	modelShader.setUniform1f("material.shiny", 0.60f);
 
-	for (int index = 0; index < modelCubePositions.size(); index++) {
-		if (index == modelIndex)
+	for (int index = 0; index < modelCubePositions.size(); index++) 
+	{
+		if (index == s_Instance.renderIndex)
 			continue;
 
 		// Drawing all the cubes for the associated object at index i
@@ -186,12 +187,12 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& wallShader, Shader& mo
 			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(index));
 			glm::mat4 modelCubePos = glm::translate(glm::mat4(1.0f), modelCubePositions.at(index).at(i));
 			glm::mat4 modelCubeScale = modelScale.at(index);
-			glm::mat4 translation = index > modelIndex ? corners.at(index - 1) : corners.at(index);
-			glm::mat4 model = glm::mat4(1.0f) 
-				* translation 
-				* initialPos 
-				* modelCubePos 
-				* modelCubeScale;
+			glm::mat4 translation = index > s_Instance.renderIndex ? corners.at(index - 1) : corners.at(index);
+			glm::mat4 model = glm::mat4(1.0f)
+				* translation
+				* initialPos
+				* modelCubeScale
+				* modelCubePos;
 
 			modelShader.setUniform4Mat("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -220,8 +221,9 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& wallShader, Shader& mo
 		wallShader.setUniform3Vec("ourColor", glm::vec3(0.63f, 0.63f, 0.63f));
 	}
 
-	for (int index = 0; index < modelCubePositions.size(); index++) {
-		if (index == modelIndex)
+	for (int index = 0; index < modelCubePositions.size(); index++) 
+	{
+		if (index == s_Instance.renderIndex)
 			continue;
 
 		// Drawing all the wall cubes for the associated object at index i
@@ -231,7 +233,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& wallShader, Shader& mo
 			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(index));
 			glm::mat4 wallCubePos = glm::translate(glm::mat4(1.0f), wallCubePositions.at(index).at(i));
 			glm::mat4 wallCubeScale = glm::scale(glm::mat4(1.0f), wallScales.at(index).at(i));
-			glm::mat4 translation = index > modelIndex ? corners.at(index - 1) : corners.at(index);
+			glm::mat4 translation = index > s_Instance.renderIndex ? corners.at(index - 1) : corners.at(index);
 
 			glm::mat4 model = glm::mat4(1.0f)
 				* initialPos
