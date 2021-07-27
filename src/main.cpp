@@ -21,9 +21,9 @@
 
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
+#include "Constants.h"
 
 #include "Renderer.h"
-#include "Constants.h"
 #include "stb_image.h" // Reference: Lab 4 (COMP 353) and LearnOpenGL; Source: https://github.com/nothings/stb/blob/master/stb_image.h
 
 using namespace std;
@@ -51,24 +51,19 @@ void resetModel();
 void processInput(GLFWwindow* window, int key, int scancode, int action, int mode);
 void processMouse(GLFWwindow* window, double xpos, double  ypos);
 void createModel(vector<vector<int>> model);
-void shuffleModel();
+void shuffleModel(vector<vector<int>> model);
 unsigned int loadTexture(char const* path);
 
-vector<vector<int>> model1 =
-{
-	{0, 0, 0, 0, 0},
-	{0, 0, 1, 2, 0},
-	{0, 1, 0, 0, 0},
-	{0, 2, 1, 0, 0},
-	{0, 0, 0, 0, 0},
-};
-vector<vector<glm::vec3>> modelPoss;
-vector<vector<glm::vec3>> wallPoss;
+
+vector<vector<glm::vec3>> modelCubePositions;
+vector<vector<glm::vec3>> wallCubePositions;
 
 // main function
 int main(int argc, char* argv[])
 {
 	createModel(model1);
+	createModel(model2);
+	createModel(model3);
 	GLFWwindow* window = initializeWindow();
 	{
 		// Setup for models
@@ -212,11 +207,11 @@ GLFWwindow* initializeWindow()
 // Reset translation matrix for each model's cube.
 void resetTransMat()
 {
-	modelTransMat.resize(modelPoss.at(modelIndex).size());
-	for (int i = 0; i < modelPoss.at(modelIndex).size(); i++)
+	modelTransMat.resize(modelCubePositions.at(modelIndex).size());
+	for (int i = 0; i < modelCubePositions.at(modelIndex).size(); i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, modelPoss.at(modelIndex).at(i));
+		model = glm::translate(model, modelCubePositions.at(modelIndex).at(i));
 		modelTransMat.at(i) = model;
 	}
 }
@@ -225,8 +220,8 @@ void resetTransMat()
 void resetRotMat()
 {
 	Renderer::getInstance().setRenderCombinedRot(true);
-	modelRotMat.resize(modelPoss.at(modelIndex).size());
-	for (int i = 0; i < modelPoss.at(modelIndex).size(); i++)
+	modelRotMat.resize(modelCubePositions.at(modelIndex).size());
+	for (int i = 0; i < modelCubePositions.at(modelIndex).size(); i++)
 		modelRotMat.at(i) = glm::mat4(1.0f);
 }
 
@@ -382,8 +377,19 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	if (key == GLFW_KEY_Y) {
-		shuffleModel();
+		switch(modelIndex){
+			case 0:
+				shuffleModel(model1);
+				break;
+			case 1:
+				shuffleModel(model2);
+				break;
+			case 2:
+				shuffleModel(model3);
+				break;
+		}
 		resetModel();
 	}
 }
@@ -466,38 +472,39 @@ void createModel(vector<vector<int>> model) {
 			}
 		}
 	}
-	modelPoss.push_back(modelPos);
-	wallPoss.push_back(wallPos);
+	modelCubePositions.push_back(modelPos);
+	wallCubePositions.push_back(wallPos);
 };
 
-void shuffleModel() {
+void shuffleModel(vector<vector<int>> model) {
 	srand(time(0));
 	//Max number of cubes between 10 - 20
-	//int remainingCube = rand() % 10 + 10;
-	//int rows = sizeof(m1) / sizeof(*m1);
-	//int cols = sizeof(*m1) / sizeof(**m1);
+	int remainingCube = rand() % 10 + 10;
 
-	//vector<glm::vec3> modelPos;
-	//for (int i = 0; i < rows; i++) {
-	//	for (int j = 0; j < cols; j++) {
-	//		if (m1[i][j] != 0) {
-	//			//for z-axis, between -3 -> +3
-	//			int numCube = rand() % 5 + (-2);
-	//			//+1 to make sure its not 0
-	//			int multiplyer = 1.0f;
-	//			if (numCube < 0) {
-	//				multiplyer = -1.0f;
-	//			}
-	//			for (int zStack = 0; zStack < abs(numCube); zStack++) {
-	//				modelPos.push_back(glm::vec3(float(j), float(abs(i - (rows - 1))), float(zStack * multiplyer)));
-	//			}
-	//			remainingCube -= numCube;
-	//			//max might exceed 20 since <1
-	//			if (remainingCube <1) {
-	//				break;
-	//			}
-	//		}
-	//	}
-	//}
-	//modelPoss.at(modelIndex) = modelPos;
+	int rows = model.size();
+	int cols = model.at(0).size();
+
+	vector<glm::vec3> modelPos;
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			if (model.at(i).at(j) != 0) {
+				//for z-axis, between -3 -> +3
+				int numCube = rand() % 5 + (-2);
+				//+1 to make sure its not 0
+				int multiplyer = 1.0f;
+				if (numCube < 0) {
+					multiplyer = -1.0f;
+				}
+				for (int zStack = 0; zStack < abs(numCube); zStack++) {
+					modelPos.push_back(glm::vec3(float(j), float(abs(i - (rows - 1))), float(zStack * multiplyer)));
+				}
+				remainingCube -= numCube;
+				//max might exceed 20 since <1
+				if (remainingCube <1) {
+					break;
+				}
+			}
+		}
+	}
+	modelCubePositions.at(modelIndex) = modelPos;
 }

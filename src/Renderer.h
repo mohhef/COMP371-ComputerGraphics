@@ -3,7 +3,6 @@
 #include "VertexArray.h"
 #include "Texture.h"
 #include "Shader.h"
-#include "Constants.h"
 
 // Assertion check helper for gl commands
 #define ASSERT(x) if (!(x)) __debugbreak();

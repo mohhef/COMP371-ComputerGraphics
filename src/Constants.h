@@ -82,70 +82,35 @@ static float meshVertices[] = {
 	1.0f, 0.0f, 0.0f
 };
 
-// initial configuration of cubes for wall
-static  vector<vector<glm::vec3>> wallCubePositions =
+static vector<vector<int>> model1 =
 {
-	{
-		glm::vec3(0.0f, 0.0f, wallZPos),
-		glm::vec3(4.0f, 4.0f, wallZPos),
-		glm::vec3(-4.0f, 4.0f, wallZPos),
-		glm::vec3(0.0f, 8.0f, wallZPos),
-		glm::vec3(2.0f, 2.0f, wallZPos),
-		glm::vec3(2.0f, 6.0f, wallZPos),
-		glm::vec3(-2.0f, 6.0f, wallZPos),
-	},
-	{
-		glm::vec3(0.0f, 0.0f, wallZPos),
-		glm::vec3(4.5f, 12.0f, wallZPos),
-		glm::vec3(-6.0f, 9.5f, wallZPos),
-		glm::vec3(-4.0f, 8.5f, wallZPos),
-		glm::vec3(-10.5f, 12.0f, wallZPos),
-		glm::vec3(-6.0f, 15.0f, wallZPos)
-	},
-	{
-		glm::vec3(0.0f, 0.3f, wallZPos),
-		glm::vec3(2.0f, 7.3f, wallZPos),
-		glm::vec3(6.4f, 6.3f, wallZPos),
-		glm::vec3(7.6f, 12.3f, wallZPos),
-		glm::vec3(-5.5f, 11.3f, wallZPos),
-		glm::vec3(2.0f, 15.45f, wallZPos),
-		glm::vec3(4.0f, 10.5f, wallZPos),
-	},
+	{0, 0, 0, 0, 0},
+	{0, 0, 1, 2, 0},
+	{0, 1, 0, 0, 0},
+	{0, 2, 1, 0, 0},
+	{0, 0, 0, 0, 0},
+};
+static vector<vector<int>> model2 =
+{
+	{0, 0, 0, 0, 0},
+	{0, 0, 1, 0, 0},
+	{0, 1, 1, 0, 0},
+	{0, 1, 0, 0, 0},
+	{0, 0, 1, -1, 0},
+	{0, 0, 0, 0, 0},
+};
+static vector<vector<int>> model3 =
+{
+	{0, 0, 0, 0, 0},
+	{0, 0, 1, 1, 0},
+	{0, 2, 0, -2, 0},
+	{0, 0, 3, -1, 0},
+	{0, 0, 0, 0, 0},
 };
 
-// initial configuration scale of wall cubes
-static vector<vector<glm::vec3>> wallScales =
-{
-	{
-		glm::vec3(6.0f, 2.0f, 2.0f),
-		glm::vec3(2.0f, 10.0f, 2.0f),
-		glm::vec3(2.0f, 10.0f, 2.0f),
-		glm::vec3(6.0f, 2.0f, 2.0f),
-		glm::vec3(2.0f, 2.0f, 2.0f),
-		glm::vec3(2.0f, 2.0f, 2.0f),
-		glm::vec3(2.0f, 2.0f, 2.0f),
-	},
-	{
-		glm::vec3(24.0f, 15.0f, 2.0f),
-		glm::vec3(15.0f, 9.0f, 2.0f),
-		glm::vec3(2.0f, 4.0f, 2.0f),
-		glm::vec3(2.0f, 2.0f, 2.0f),
-		glm::vec3(3.0f, 9.0f, 2.0f),
-		glm::vec3(6.0f, 3.0f, 2.0f)
-	},
-	{
-		glm::vec3(20.0f, 10.0f, 1.0f),
-		glm::vec3(1.8f, 4.0f, 1.0f),
-		glm::vec3(7.2f, 2.0f, 1.0f),
-		glm::vec3(4.8f, 10.0f, 1.0f),
-		glm::vec3(9.0f, 12.0f, 1.0f),
-		glm::vec3(6.0f, 3.7f, 1.0f),
-		glm::vec3(2.0f, 2.0f, 1.0f),
-	},
-};
 
-extern vector<vector<glm::vec3>> modelPoss;
-extern vector<vector<glm::vec3>> wallPoss;
+extern vector<vector<glm::vec3>> modelCubePositions;
+extern vector<vector<glm::vec3>> wallCubePositions;
 
 // initial configuration position of wall (to align with XZ plane)
 static vector<glm::vec3> wallPosition =
@@ -155,45 +120,6 @@ static vector<glm::vec3> wallPosition =
 	glm::vec3(0.0f, 4.7f, 10.0f),
 };
 
-// initial configuration of cubes for model
-static vector<vector<glm::vec3>> modelCubePositions =
-{
-	{
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(1.0f, 0.0f, 0.0f),
-		glm::vec3(-1.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-		glm::vec3(0.0f, -1.0f, 0.0f),
-		glm::vec3(0.0f, 0.0f, 1.0f),
-		glm::vec3(0.0f, 0.0f, 2.0f),
-		glm::vec3(-1.0f, -1.0f,0.0f),
-		glm::vec3(-1.0f, -1.0f,-1.0f),
-	},
-	{
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-		glm::vec3(0.0f, -1.0f, 0.0f),
-		glm::vec3(1.0f, 0.0f, 0.0f),
-		glm::vec3(2.0f, 0.0f, 0.0f),
-		glm::vec3(2.0f, 1.0f, 0.0f),
-		glm::vec3(2.0f, 0.0f, -1.0f),
-		glm::vec3(0.0f, 0.0f, -1.0f),
-		glm::vec3(0.0f, 0.0f, -2.0f),
-	},
-	{
-		glm::vec3(0.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f),
-		glm::vec3(0.0f, 0.0f, 1.0f),
-		glm::vec3(1.0f, 1.0f, 0.0f),
-		glm::vec3(2.0f, 2.0f, 0.0f),
-		glm::vec3(3.0f, 0.0f, 0.0f),
-		glm::vec3(2.0f, 0.0f, 0.0f),
-		glm::vec3(1.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 2.0f, 2.0f),
-		glm::vec3(0.0f, 1.0f, 2.0f),
-		glm::vec3(0.0f, 2.0f, 1.0f),
-	},
-};
 
 // initial configuration scale of model cubes
 static vector<glm::mat4> modelScale
@@ -207,7 +133,7 @@ static vector<glm::mat4> modelScale
 static vector<glm::vec3> modelPosition =
 {
 	glm::vec3(0.0f, 0.0f, 10.0f),
-	glm::vec3(-8.0f, 20.0f, 10.0f),
-	glm::vec3(0.0f, 17.2f, 10.0f)
+	glm::vec3(0.0f, 0.0f, 10.0f),
+	glm::vec3(0.0f, 0.0f, 10.0f)
 };
 

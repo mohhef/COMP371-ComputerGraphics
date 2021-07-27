@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Renderer.h"
+#include "Constants.h"
 
 // Clear openGL errors, makes it easier for debugging
 void glClearError()
@@ -140,7 +141,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, Texture& textu
 	shader.setUniform1i("textureStatus", 0);
 
 	for (int index = 0; index < modelCubePositions.size(); index++) {
-		if (index == modelIndex)
+		if (index == s_Instance.renderIndex)
 			continue;
 
 		// Drawing all the cubes for the associated object at index i
@@ -153,9 +154,10 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, Texture& textu
 			glm::mat4 translation = index > modelIndex ? corners.at(index - 1) : corners.at(index);
 			glm::mat4 model = glm::mat4(1.0f) 
 				* translation 
-				* initialPos 
+				* initialPos
+				* modelCubeScale
 				* modelCubePos 
-				* modelCubeScale;
+				;
 
 			shader.setUniform4Mat("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -167,23 +169,22 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, Texture& textu
 	shader.setUniform1i("textureStatus", 1);
 
 	for (int index = 0; index < modelCubePositions.size(); index++) {
-		if (index == modelIndex)
+		if (index == s_Instance.renderIndex)
 			continue;
 
 		// Drawing all the wall cubes for the associated object at index i
 		int numWallPieces = wallCubePositions.at(index).size();
 		for (int i = 0; i < numWallPieces; i++) 
 		{
-			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), wallPosition.at(index));
+			glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(index));
 			glm::mat4 wallCubePos = glm::translate(glm::mat4(1.0f), wallCubePositions.at(index).at(i));
-			glm::mat4 wallCubeScale = glm::scale(glm::mat4(1.0f), wallScales.at(index).at(i));
 			glm::mat4 translation = index > modelIndex ? corners.at(index - 1) : corners.at(index);
 
 			glm::mat4 model = glm::mat4(1.0f)
 				* initialPos
 				* translation
-				* wallCubePos
-				* wallCubeScale;
+				* modelScale.at(renderIndex)
+				* wallCubePos;
 
 			shader.setUniform4Mat("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -208,7 +209,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, vector<glm::mat4> mod
 	shader.setUniform1i("textureStatus", 0);
 
 
-	int numCubePieces = modelPoss.at(renderIndex).size();
+	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	float time = (float)glfwGetTime();
 	// draw the model from all the cubes
 	for (int i = 0; i < numCubePieces; i++){
@@ -270,7 +271,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, Texture& texture, vecto
 		rotationMatrix = modelRotMat.at(1);
 	}
 
-	int numWallPieces = wallPoss.at(renderIndex).size();
+	int numWallPieces = wallCubePositions.at(renderIndex).size();
 	for (int i = 0; i < numWallPieces; i++)
 	{
 		// calculate model matrix for each object and pass it to shader before drawing
@@ -284,7 +285,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, Texture& texture, vecto
 			* initialPos
 			* rotationMatrix
 			* modelScale.at(renderIndex)
-			* glm::translate(glm::mat4(1.0f), wallPoss.at(renderIndex).at(i));
+			* glm::translate(glm::mat4(1.0f), wallCubePositions.at(renderIndex).at(i));
 
 		shader.setUniform4Mat("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
