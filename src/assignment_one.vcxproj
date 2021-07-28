@@ -166,6 +166,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="axes.shader" />
+    <None Include="depthMap.shader" />
     <None Include="lightingSource.shader" />
     <None Include="vertex_fragment.shader" />
   </ItemGroup>

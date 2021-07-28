@@ -27,18 +27,18 @@ Shader::~Shader()
 unsigned int Shader::createShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
 	// create shader program
-	unsigned int program = glCreateProgram();
+	GLCall(unsigned int program = glCreateProgram());
 
 	// assign object id to each shader
 	unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShader);
 	unsigned int fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
 	// attach shaders
-	glAttachShader(program, vs);
-	glAttachShader(program, fs);
+	GLCall(glAttachShader(program, vs));
+	GLCall(glAttachShader(program, fs));
 
 	// link shaders
-	glLinkProgram(program);
+	GLCall(glLinkProgram(program));
 	
 	GLint program_linked;
 
@@ -53,7 +53,7 @@ unsigned int Shader::createShader(const std::string& vertexShader, const std::st
 		std::cout << message << std::endl;
 	}
 	
-	glValidateProgram(program);
+	GLCall(glValidateProgram(program));
 
 	// since they have been linked already we can delete
 	glDeleteShader(vs);
@@ -127,6 +127,11 @@ void Shader::bind() const
 void Shader::unbind() const
 {
 	GLCall(glUseProgram(0));
+}
+
+void Shader::setInt(const std::string& name, int value) const
+{
+	glUniform1i(glGetUniformLocation(id, name.c_str()), value);
 }
 
 void Shader::setUniform1i(const std::string& name, int i) {

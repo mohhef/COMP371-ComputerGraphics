@@ -75,21 +75,24 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 }
 
 // Renderer for drawing the mesh
-void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, float scaleFactor)
+void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, float scaleFactor, bool findDepth)
 {
 	// Binding vertex array and shader
 	va.bind();
-	shader.bind();
+	if (!findDepth) {
+		shader.bind();
 
-	// Setting all uniform variables
-	shader.setUniform4Mat("view", view);
-	shader.setUniform4Mat("projection", projection);
-	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform3Vec("lightPos", lightPos);
-	shader.setUniform3Vec("viewPos", cameraPos);
-	shader.setUniform3Vec("ourColor", glm::vec3(0.5f, 0.5f, 0.5f));
-	shader.setUniform1i("textureStatus", 0);
-	shader.setUniform1i("shininess", 32);
+		//Setting all uniform variables
+		shader.setUniform4Mat("view", view);
+		shader.setUniform4Mat("projection", projection);
+		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("viewPos", cameraPos);
+		shader.setUniform3Vec("ourColor", glm::vec3(0.5f, 0.5f, 0.5f));
+		shader.setUniform1i("textureStatus", 0);
+		shader.setUniform1i("shininess", 32);
+	}
+	
 
 	// Materials to be used by the following for loop
 	glm::mat4 model;
@@ -114,26 +117,34 @@ void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 
 	// Unbinding for easier debugging
 	va.unbind();
-	shader.unbind();
+	if (!findDepth) {
+		shader.unbind();
+	}
+	
 }
 
 // Renderer for drawing floor (with texture)
-void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture)
+void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, bool findDepth)
 {
 	// Binding vertex array and shader
 	va.bind();
-	shader.bind();
+	if (!findDepth) {
+		shader.bind();
+	}
 	texture.bind();
 
 	// Setting all uniform variables
-	shader.setUniform4Mat("view", view);
-	shader.setUniform4Mat("projection", projection);
-	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform3Vec("lightPos", lightPos);
-	shader.setUniform3Vec("viewPos", cameraPos);
-	shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform1i("shininess", 32);
-	shader.setUniform1i("textureStatus", 1);
+	if (!findDepth) {
+		shader.setUniform4Mat("view", view);
+		shader.setUniform4Mat("projection", projection);
+		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("viewPos", cameraPos);
+		shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setUniform1i("shininess", 32);
+		shader.setUniform1i("textureStatus", 1);
+	}
+	
 
 	// scale and align with XZ plane
 	glm::mat4 model = glm::mat4(1.0f)
@@ -144,12 +155,14 @@ void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::m
 
 	// unbind for easier debugging
 	va.unbind();
-	shader.unbind();
+	if (!findDepth) {
+		shader.unbind();
+	}
 	texture.unbind();
 }
 
 // Renderer for drawing the static models and walls at the corners of the map
-void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel, bool status) 
+void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel, bool status, bool findDepth) 
 {
 	// Translation to put non-centered models
 	vector<glm::mat4> corners = 
@@ -163,30 +176,37 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 
 	// Binding vertex array and shader
 	va.bind();
-	shader.bind();
+	if (!findDepth) {
+		shader.bind();
+	}
 	textureModel.bind();
 
 	// Set uniform variables
-	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform3Vec("lightPos", lightPos);
-	shader.setUniform3Vec("viewPos", cameraPos);
-	shader.setUniform4Mat("projection", projection);
-	shader.setUniform4Mat("view", view);
+	if (!findDepth) {
+		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("viewPos", cameraPos);
+		shader.setUniform4Mat("projection", projection);
+		shader.setUniform4Mat("view", view);
+	}
+	
 
 	// Handle texture display toggle
-	if (status)
-	{
-		shader.setUniform1i("textureStatus", 1);
-		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
-		shader.setUniform1i("shininess", 16);
+	if (!findDepth) {
+		if (status)
+		{
+			shader.setUniform1i("textureStatus", 1);
+			shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
+			shader.setUniform1i("shininess", 16);
+		}
+		else
+		{
+			shader.setUniform1i("textureStatus", 0);
+			shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
+			shader.setUniform1i("shininess", 32);
+		}
 	}
-	else
-	{
-		shader.setUniform1i("textureStatus", 0);
-		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
-		shader.setUniform1i("shininess", 32);
-	}
-
+	
 	// Draw objects
 	for (int index = 0; index < modelCubePositions.size(); index++) 
 	{
@@ -215,20 +235,23 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	textureModel.unbind();
 	textureWall.bind();
 
-	// Set uniform variables
-	shader.setUniform1i("shininess", 32);
+	if (!findDepth) {
+		// Set uniform variables
+		shader.setUniform1i("shininess", 32);
 
-	// Handle texture display toggle
-	if (status)
-	{
-		shader.setUniform1i("textureStatus", 1);
-		shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		// Handle texture display toggle
+		if (status)
+		{
+			shader.setUniform1i("textureStatus", 1);
+			shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		}
+		else
+		{
+			shader.setUniform1i("textureStatus", 0);
+			shader.setUniform3Vec("ourColor", glm::vec3(0.63f, 0.63f, 0.63f));
+		}
 	}
-	else
-	{
-		shader.setUniform1i("textureStatus", 0);
-		shader.setUniform3Vec("ourColor", glm::vec3(0.63f, 0.63f, 0.63f));
-	}
+	
 	
 	// Draw walls
 	for (int index = 0; index < modelCubePositions.size(); index++) 
@@ -257,37 +280,44 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	}
 
 	va.unbind();
-	shader.unbind();
+	if (!findDepth) {
+		shader.unbind();
+	}
 	textureWall.unbind();
 }
 
 // Draw the model that is currently in use
-void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, bool status)
+void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, bool status, bool findDepth)
 {
 	// Bind the vertex array and shader
 	va.bind();
-	shader.bind();
+	if (!findDepth) {
+		shader.bind();
+	}
 	texture.bind();
 
-	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform3Vec("lightPos", lightPos);
-	shader.setUniform3Vec("viewPos", cameraPos);
-	shader.setUniform4Mat("projection", projection);
-	shader.setUniform4Mat("view", view);
+	if (!findDepth) {
+		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("viewPos", cameraPos);
+		shader.setUniform4Mat("projection", projection);
+		shader.setUniform4Mat("view", view);
 
-	// handle texture display toggle
-	if (status)
-	{
-		shader.setUniform1i("textureStatus", 1);
-		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
-		shader.setUniform1i("shininess", 16);
+		// handle texture display toggle
+		if (status)
+		{
+			shader.setUniform1i("textureStatus", 1);
+			shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
+			shader.setUniform1i("shininess", 16);
+		}
+		else
+		{
+			shader.setUniform1i("textureStatus", 0);
+			shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
+			shader.setUniform1i("shininess", 32);
+		}
 	}
-	else
-	{
-		shader.setUniform1i("textureStatus", 0);
-		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
-		shader.setUniform1i("shininess", 32);
-	}
+	
 
 	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	float time = (float)glfwGetTime();
@@ -306,7 +336,10 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 
 	// unbind for easier debugging
 	va.unbind();
-	shader.unbind();
+	if (!findDepth) {
+		shader.unbind();
+	}
+	
 }
 
 //Draw the lighting object
@@ -333,32 +366,37 @@ void Renderer::drawLightingSource(VertexArray& va, Shader& shader, glm::mat4 vie
 }
 
 // Draw the wall that is currently in use
-void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, bool status)
+void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, bool status, bool findDepth)
 {
 	// bind the vertex array and shader
 	va.bind();
-	shader.bind();
+	if (!findDepth) {
+		shader.bind();
+	}
 	texture.bind();
 
-	// set all uniform variables
-	shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-	shader.setUniform3Vec("lightPos", lightPos);
-	shader.setUniform3Vec("viewPos", cameraPos);
-	shader.setUniform4Mat("projection", projection);
-	shader.setUniform4Mat("view", view);
-	shader.setUniform1i("shininess", 32);
+	if (!findDepth) {
+		// set all uniform variables
+		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("viewPos", cameraPos);
+		shader.setUniform4Mat("projection", projection);
+		shader.setUniform4Mat("view", view);
+		shader.setUniform1i("shininess", 32);
 
-	// handle texture display toggle
-	if (status)
-	{
-		shader.setUniform1i("textureStatus", 1);
-		shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		// handle texture display toggle
+		if (status)
+		{
+			shader.setUniform1i("textureStatus", 1);
+			shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
+		}
+		else
+		{
+			shader.setUniform1i("textureStatus", 0);
+			shader.setUniform3Vec("ourColor", glm::vec3(0.63f, 0.63f, 0.63f));
+		}
 	}
-	else 
-	{
-		shader.setUniform1i("textureStatus", 0);
-		shader.setUniform3Vec("ourColor", glm::vec3(0.63f, 0.63f, 0.63f));
-	}
+	
 	
 	//using the same roation as the object will work 
 	if (combinedRot == true) {
@@ -387,6 +425,8 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
   
 	// unbind for easier debugging
 	va.unbind();
-	shader.unbind();
+	if (!findDepth) {
+		shader.unbind();
+	}
 	texture.unbind();
 }

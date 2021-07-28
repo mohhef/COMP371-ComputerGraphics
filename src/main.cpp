@@ -103,6 +103,32 @@ int main(int argc, char* argv[])
 		Shader* shader = new Shader("vertex_fragment.shader");
 		Shader* axesShader = new Shader("axes.shader");
 		Shader* lightingSourceShader = new Shader("lightingSource.shader");
+		Shader* depthShader = new Shader("depthMap.shader");
+
+		shader->bind();
+		shader->setInt("diffuseTexture", 0);
+		shader->setInt("shadowMap", 1);
+
+		// Setup for shadows
+		unsigned int depthMapFBO;
+		GLCall(glGenFramebuffers(1, &depthMapFBO));
+
+		const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+		unsigned int depthMap;
+		GLCall(glGenTextures(1, &depthMap));
+		GLCall(glBindTexture(GL_TEXTURE_2D, depthMap));
+		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH,
+			SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL));
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+
+		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO));
+		GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
+			depthMap, 0));
+		GLCall(glDrawBuffer(GL_NONE));
+		GLCall(glReadBuffer(GL_NONE));
+		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
 		// Renddering setup
 		Renderer& renderer = Renderer::getInstance();
@@ -143,18 +169,51 @@ int main(int argc, char* argv[])
 			glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 200.0f);
 			glm::mat4 view = camera->getViewMatrix();
 
+			glm::mat4 lightProjection, lightView;
+			glm::mat4 lightSpaceMatrix;
+			float near_plane = 1.0f, far_plane = 75.0f;
+			lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+			lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+			lightSpaceMatrix = lightProjection * lightView;
+
+			depthShader->bind();
+			depthShader->setUniform4Mat("lightSpaceMatrix", lightSpaceMatrix);
+
+			GLCall(glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT));
+			GLCall(glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO));
+			GLCall(glClear(GL_DEPTH_BUFFER_BIT));
 			// Render each object (wall, model, static models, axes, and mesh floor)
-			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
-			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
-			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
+			renderer.drawObject(vA, *depthShader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus, true);
+			renderer.drawWall(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus, true);
+			renderer.drawStaticObjects(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus, true);
+
+			if (textureStatus)
+				renderer.drawFloor(vaFloor, *depthShader, view, projection, lightPos, camera->position, tileTexture, true);
+			else
+				renderer.drawMesh(vaMesh, *depthShader, view, projection, lightPos, camera->position, scaleFactor, true);
+			GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+			glViewport(0, 0, WIDTH, HEIGHT);
+			GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+			glViewport(0, 0, WIDTH, HEIGHT);
+			GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+			shader->bind();
+			shader->setUniform4Mat("lightSpaceMatrix", lightSpaceMatrix);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, depthMap);
+
+			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus, false);
+			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus, false);
+			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus, false);
+
+			if (textureStatus)
+				renderer.drawFloor(vaFloor, *shader, view, projection, lightPos, camera->position, tileTexture, false);
+			else
+				renderer.drawMesh(vaMesh, *shader, view, projection, lightPos, camera->position, scaleFactor, false);
 			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
 
-			if (textureStatus)
-				renderer.drawFloor(vaFloor, *shader, view, projection, lightPos, camera->position, tileTexture);
-			else
-				renderer.drawMesh(vaMesh, *shader, view, projection, lightPos, camera->position, scaleFactor);
-			
 			// End frame
 			glfwSwapBuffers(window);
 
