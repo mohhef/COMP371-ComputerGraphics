@@ -15,6 +15,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <iostream>
+#include <string>
+
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
@@ -36,6 +39,7 @@ glm::vec3 displacement;
 float scaleFactor = 1.0f;
 bool combinedRot = false;
 bool textureStatus = true;
+bool shadows = true;
 
 // Cursor positions for mouse inputs
 float lastMouseX;
@@ -107,27 +111,29 @@ int main(int argc, char* argv[])
 
 		shader->bind();
 		shader->setInt("diffuseTexture", 0);
-		shader->setInt("shadowMap", 1);
+		shader->setInt("depthMap", 1);
 
 		// Setup for shadows
 		unsigned int depthMapFBO;
 		GLCall(glGenFramebuffers(1, &depthMapFBO));
 
 		const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-		unsigned int depthMap;
-		GLCall(glGenTextures(1, &depthMap));
-		GLCall(glBindTexture(GL_TEXTURE_2D, depthMap));
-		GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH,
-			SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL));
-		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-		GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+		unsigned int depthCubeMap;
+		GLCall(glGenTextures(1, &depthCubeMap));
+		GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMap));
+		for (unsigned int i = 0; i < 6; ++i) {
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO));
-		GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-			depthMap, 0));
+		GLCall(glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubeMap, 0));
 		GLCall(glDrawBuffer(GL_NONE));
 		GLCall(glReadBuffer(GL_NONE));
-		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
 		// Renddering setup
@@ -169,19 +175,50 @@ int main(int argc, char* argv[])
 			glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 200.0f);
 			glm::mat4 view = camera->getViewMatrix();
 
-			glm::mat4 lightProjection, lightView;
-			glm::mat4 lightSpaceMatrix;
-			float near_plane = 1.0f, far_plane = 75.0f;
-			lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
-			lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-			lightSpaceMatrix = lightProjection * lightView;
 
-			depthShader->bind();
-			depthShader->setUniform4Mat("lightSpaceMatrix", lightSpaceMatrix);
+			float aspect = (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT;
+			float near = 1.0f;
+			float far = 125.0f;
+
+			glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect,
+				near, far);
+
+			std::vector<glm::mat4> shadowTransforms;
+			shadowTransforms.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0)
+					, glm::vec3(0.0, -1.0, 0.0)));
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 1.0, 0.0)
+					, glm::vec3(0.0, 0.0, 1.0)));
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, -1.0, 0.0)
+					, glm::vec3(0.0, 0.0, -1.0)));
+			shadowTransforms.push_back(shadowProj * 
+				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, 1.0)
+				, glm::vec3(0.0, -1.0, 0.0)));
+			shadowTransforms.push_back(shadowProj *
+				glm::lookAt(lightPos, lightPos + glm::vec3(0.0, 0.0, -1.0)
+					, glm::vec3(0.0, -1.0, 0.0)));
+
+			//glm::mat4 lightProjection, lightView;
+			//glm::mat4 lightSpaceMatrix;
+			//float near_plane = 1.0f, far_plane = 75.0f;
+			//lightProjection = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, near_plane, far_plane);
+			//lightView = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+			//lightSpaceMatrix = lightProjection * lightView;
+			//depthShader->setUniform4Mat("lightSpaceMatrix", lightSpaceMatrix);
 
 			GLCall(glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT));
 			GLCall(glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO));
 			GLCall(glClear(GL_DEPTH_BUFFER_BIT));
+			depthShader->bind();
+			for (int i = 0; i < 6; ++i) {
+				depthShader->setUniform4Mat("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+			}
+			//std::cout << "hello" << std::endl;
+			depthShader->setUniform1f("far_plane", far);
+			depthShader->setUniform3Vec("lightPos", lightPos);
 			// Render each object (wall, model, static models, axes, and mesh floor)
 			renderer.drawObject(vA, *depthShader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus, true);
 			renderer.drawWall(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus, true);
@@ -195,13 +232,14 @@ int main(int argc, char* argv[])
 
 			glViewport(0, 0, WIDTH, HEIGHT);
 			GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-			glViewport(0, 0, WIDTH, HEIGHT);
-			GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
 			shader->bind();
-			shader->setUniform4Mat("lightSpaceMatrix", lightSpaceMatrix);
+			shader->setUniform3Vec("lightPos", lightPos);
+			shader->setUniform3Vec("viewPos", camera->position);
+			shader->setUniform1i("shadows", shadows);
+			shader->setUniform1f("far_plane", far);
 			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, depthMap);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubeMap);
 
 			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus, false);
 			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus, false);

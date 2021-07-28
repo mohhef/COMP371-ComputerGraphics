@@ -13,7 +13,7 @@ Shader::Shader(const std::string& filePath)
 	this->filePath = filePath;
 	// Creating a program source object to store the shaders at the specified file path
 	ShaderProgramSource source = parseShader(filePath);
-	id = createShader(source.vertexSource, source.fragmentSource);
+	id = createShader(source.vertexSource, source.fragmentSource, source.geometrySource);
 
 }
 
@@ -24,7 +24,7 @@ Shader::~Shader()
 }
 
 // Method for creating the shader and returning its id
-unsigned int Shader::createShader(const std::string& vertexShader, const std::string& fragmentShader)
+unsigned int Shader::createShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader)
 {
 	// create shader program
 	GLCall(unsigned int program = glCreateProgram());
@@ -32,10 +32,17 @@ unsigned int Shader::createShader(const std::string& vertexShader, const std::st
 	// assign object id to each shader
 	unsigned int vs = compileShader(GL_VERTEX_SHADER, vertexShader);
 	unsigned int fs = compileShader(GL_FRAGMENT_SHADER, fragmentShader);
+	unsigned int gs;
+	if (geometryShader != "") {
+		gs = compileShader(GL_GEOMETRY_SHADER, geometryShader);
+	}
 
 	// attach shaders
 	GLCall(glAttachShader(program, vs));
 	GLCall(glAttachShader(program, fs));
+	if (geometryShader != "") {
+		GLCall(glAttachShader(program, gs));
+	}
 
 	// link shaders
 	GLCall(glLinkProgram(program));
@@ -58,6 +65,9 @@ unsigned int Shader::createShader(const std::string& vertexShader, const std::st
 	// since they have been linked already we can delete
 	glDeleteShader(vs);
 	glDeleteShader(fs);
+	if (geometryShader != "") {
+		glDeleteShader(gs);
+	}
 
 	return program;
 }
@@ -95,8 +105,9 @@ ShaderProgramSource Shader::parseShader(const std::string& filepath)
 	std::ifstream stream(filepath);
 
 	std::string line;
-	std::stringstream ss[2];
+	std::stringstream ss[3];
 	ShaderType type = ShaderType::NONE;
+	bool hasGeometry = false;
 
 	// Read through the program line by line
 	while (getline(stream, line)) {
@@ -108,13 +119,18 @@ ShaderProgramSource Shader::parseShader(const std::string& filepath)
 				type = ShaderType::VERTEX;
 			else if (line.find("fragment") != std::string::npos)
 				type = ShaderType::FRAGMENT;
+			else if (line.find("geometry")) {
+				type = ShaderType::GEOMETRY;
+				hasGeometry = true;
+			}
 		}
 		else
 		{
 			ss[(int)type] << line << "\n";
 		}
 	}
-	return { ss[0].str(), ss[1].str() };
+	if (hasGeometry) return { ss[0].str(), ss[1].str(), ss[2].str() };
+	return { ss[0].str(), ss[1].str(), "" };
 }
 
 // Bind the shader
