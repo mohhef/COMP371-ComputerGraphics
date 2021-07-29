@@ -150,7 +150,7 @@ void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::m
 }
 
 // Renderer for drawing the static models and walls at the corners of the map
-void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel, bool status) 
+void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel) 
 {
 	// Translation to put non-centered models
 	vector<glm::mat4> corners = 
@@ -175,7 +175,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	shader.setUniform4Mat("view", view);
 
 	// Handle texture display toggle
-	if (status)
+	if (isTextureEnabled)
 	{
 		shader.setUniform1i("textureStatus", 1);
 		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
@@ -220,7 +220,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	shader.setUniform1i("shininess", 32);
 
 	// Handle texture display toggle
-	if (status)
+	if (isTextureEnabled)
 	{
 		shader.setUniform1i("textureStatus", 1);
 		shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -288,7 +288,7 @@ void Renderer::drawBoundary(VertexArray& va, Shader& shader, glm::mat4 view, glm
 
 
 // Draw the model that is currently in use
-void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, bool status)
+void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement)
 {
 	// Bind the vertex array and shader
 	va.bind();
@@ -302,7 +302,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 	shader.setUniform4Mat("view", view);
 
 	// handle texture display toggle
-	if (status)
+	if (isTextureEnabled)
 	{
 		shader.setUniform1i("textureStatus", 1);
 		shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
@@ -358,7 +358,7 @@ void Renderer::drawLightingSource(VertexArray& va, Shader& shader, glm::mat4 vie
 }
 
 // Draw the wall that is currently in use
-void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, bool status)
+void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement)
 {
 	// bind the vertex array and shader
 	va.bind();
@@ -374,7 +374,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	shader.setUniform1i("shininess", 32);
 
 	// handle texture display toggle
-	if (status)
+	if (isTextureEnabled)
 	{
 		shader.setUniform1i("textureStatus", 1);
 		shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));

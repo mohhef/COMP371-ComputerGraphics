@@ -55,7 +55,6 @@ void createModel(vector<vector<int>> model);
 void shuffleModel(vector<vector<int>> model);
 void randomRotation();
 int getTotalCubes(vector <vector<int>> model);
-unsigned int loadTexture(char const* path);
 
 
 vector<vector<glm::vec3>> modelCubePositions;
@@ -164,11 +163,10 @@ int main(int argc, char* argv[])
 			glm::mat4 view = camera->getViewMatrix();
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
-			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
+			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement);
 			renderer.drawBoundary(vaBound, *axesShader, view, projection, modelRotMat, modelTransMat, scaleFactor, displacement);
-
-			//renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
-			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
+			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement);
+			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture);
 			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
 
@@ -421,6 +419,7 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 		textureStatus = !textureStatus;
+		Renderer::getInstance().isTextureEnabled = textureStatus;
 }
 
 // Function for processing mouse input
