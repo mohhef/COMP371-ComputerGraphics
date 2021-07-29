@@ -22,7 +22,38 @@ static float lastY = HEIGHT / 2;
 static bool initialMousePos = true;
 
 
+static float cubeVertices[] = {
 
+-0.5f, 0.5f, 0.5f,
+0.5f, 0.5f, 0.5f,
+0.5f, 0.5f, 0.5f,
+0.5f, -0.5f, 0.5f,
+
+0.5f, -0.5f, 0.5f,
+-0.5f, -0.5f, 0.5f,
+-0.5f, -0.5f, 0.5f,
+-0.5f, 0.5f,0.5f,
+
+0.5f, 0.5f, 0.5f,
+0.5f, 0.5f, -0.5f,
+0.5f, 0.5f, -0.5f,
+0.5f, -0.5f, -0.5f,
+
+  0.5f, -0.5f, -0.5f,
+  0.5f, -0.5f, 0.5f,
+  0.5f, 0.5f, -0.5f,
+-0.5f, 0.5f, -0.5f,
+
+-0.5f, -0.5f, -0.5,
+  0.5f, -0.5f, -0.5f,
+-0.5f, -0.5f, -0.5,
+-0.5f,  0.5f, -0.5f,
+
+-0.5f,  0.5f, -0.5f,
+-0.5f,  0.5f,  0.5f,
+-0.5f, -0.5f,  0.5f,
+-0.5f, -0.5f, -0.5,
+};
 //Position(f,f,f) Normal(f,f,f) Texture(f,f)
 static float vertices[] =
 {

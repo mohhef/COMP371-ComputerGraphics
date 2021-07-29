@@ -261,6 +261,32 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	textureWall.unbind();
 }
 
+void Renderer::drawBoundary(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement)
+{
+	va.bind();
+	shader.bind();
+
+	shader.setUniform4Mat("projection", projection);
+	shader.setUniform4Mat("view", view);
+	shader.setUniform4Vec("ourColor", glm::vec4(0.0, 1.0, 0.0, 1.0));
+	int numCubePieces = modelCubePositions.at(renderIndex).size();
+	for (int i = 0; i < numCubePieces; i++) {
+		// adjust position based on user input
+		glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(displacement.x, 0.0f, displacement.z));
+		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(renderIndex));
+
+		// unit matrix * scaling input * xz_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
+		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i) * modelScale.at(renderIndex) * modelTransMat.at(i);
+
+		shader.setUniform4Mat("model", model);
+		glDrawArrays(GL_LINES, 0, 24);
+	}
+	// unbind for easier debugging
+	va.unbind();
+	shader.unbind();
+}
+
+
 // Draw the model that is currently in use
 void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, bool status)
 {
@@ -290,7 +316,6 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 	}
 
 	int numCubePieces = modelCubePositions.at(renderIndex).size();
-	float time = (float)glfwGetTime();
 	// draw the model from all the cubes
 	for (int i = 0; i < numCubePieces; i++){
 		// adjust position based on user input

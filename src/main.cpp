@@ -78,6 +78,13 @@ int main(int argc, char* argv[])
 		layout.push<float>(3);
 		layout.push<float>(2);
 		vA.addBuffer(vB, layout);
+		
+		// Setup for boundary
+		VertexArray vaBound;
+		VertexBuffer vbBound(cubeVertices, sizeof(cubeVertices));
+		VertexBufferLayout layoutBound;
+		layoutBound.push<float>(3);
+		vaBound.addBuffer(vbBound, layoutBound);
 
 		// Setup for lighting
 		VertexArray vaLightingSource;
@@ -158,7 +165,9 @@ int main(int argc, char* argv[])
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
 			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
-			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
+			renderer.drawBoundary(vaBound, *axesShader, view, projection, modelRotMat, modelTransMat, scaleFactor, displacement);
+
+			//renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
 			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
 			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
