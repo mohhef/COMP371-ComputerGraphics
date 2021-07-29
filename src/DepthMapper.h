@@ -2,10 +2,13 @@
 #include <functional>
 
 #include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Renderer.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "Constants.h"
 
 
 float near = 1.0f;
