@@ -442,6 +442,10 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		resetModel(true);
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+		shadows = !shadows;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 		textureStatus = !textureStatus;
 }
