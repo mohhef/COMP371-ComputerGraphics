@@ -122,6 +122,13 @@ static vector<vector<vector<int>>> models = {
 	{ 0, 2, 0, -2, 0 },
 	{ 0, 0, 2, 1, 0 },
 	{ 0, 0, 0, 0, 0 },
+},
+{
+	{ 0, 0, 0, 0, 0 },
+	{ 0, 2, 1, 0, 0 },
+	{ 0, 0, -1, -2, 0 },
+	{ 0, 2, -1, 0, 0 },
+	{ 0, 0, 0, 0, 0 },
 }
 };
 
@@ -136,7 +143,8 @@ static vector<glm::vec3> wallPosition =
 	glm::vec3(0.0f, 1.0f, 10.0f),
 	glm::vec3(0.0f, 7.5f, 10.0f),
 	glm::vec3(0.0f, 4.7f, 10.0f),
-	glm::vec3(0.0f, 5.0f, 0.0f)
+	glm::vec3(0.0f, 5.0f, 0.0f),
+	glm::vec3(0.0f, 5.0f, 10.0f)
 };
 
 
@@ -146,12 +154,15 @@ static vector<glm::mat4> modelScale
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
+	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f)),
 	glm::scale(glm::mat4(1.0f), glm::vec3(2.0f, 2.0f, 2.0f))
+
 };
 
 // initial configuration position of model (to align with hole)
 static vector<glm::vec3> modelPosition =
 {
+	glm::vec3(0.0f, 1.0f, 10.0f),
 	glm::vec3(0.0f, 1.0f, 10.0f),
 	glm::vec3(0.0f, 1.0f, 10.0f),
 	glm::vec3(0.0f, 1.0f, 10.0f),
