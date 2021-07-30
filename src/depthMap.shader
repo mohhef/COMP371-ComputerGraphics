@@ -1,4 +1,5 @@
 #shader vertex
+// These shaders were heavily influenced by learnOpengl.com: https://learnopengl.com/
 #version 330 core
 layout(location = 0) in vec3 aPos;
 
@@ -14,19 +15,21 @@ void main()
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 18) out;
 
-uniform mat4 shadowMatrices[6];
+// Cube faces for which we will use to draw the depth map in all 6 directions from the point light.
+uniform mat4 shadowCubeFaces[6];
 
 out vec4 FragPos; // FragPos from GS (output per emitvertex)
 
 void main()
 {
+    // for each face emit a depth map
     for (int face = 0; face < 6; ++face)
     {
-        gl_Layer = face; // built-in variable that specifies to which face we render.
-        for (int i = 0; i < 3; ++i) // for each triangle's vertices
+        gl_Layer = face; // a built-in variable that specifies to which face we render.
+        for (int i = 0; i < 3; ++i) // for each of the triangle's vertices
         {
             FragPos = gl_in[i].gl_Position;
-            gl_Position = shadowMatrices[face] * FragPos;
+            gl_Position = shadowCubeFaces[face] * FragPos;
             EmitVertex();
         }
         EndPrimitive();
@@ -38,16 +41,19 @@ void main()
 
 in vec4 FragPos;
 
-uniform vec3 lightPos;
-uniform float far_plane;
+// Position of the light
+uniform vec3 lightPosition;
+// The distance for which we will render the light
+uniform float map_range;
 
 void main()
 {
-    float lightDistance = length(FragPos.xyz - lightPos);
+    // Distance from the light
+    float lightDistance = length(FragPos.xyz - lightPosition);
 
     // map to [0;1] range by dividing by far_plane
-    lightDistance = lightDistance / far_plane;
+    lightDistance = lightDistance / map_range;
 
-    // write this as modified depth
+    // write the distance from the light as the measured depth
     gl_FragDepth = lightDistance;
 }

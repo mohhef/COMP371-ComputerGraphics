@@ -75,11 +75,11 @@ void DepthMapper::Draw(Shader* depthShader, glm::vec3 lightPos, std::function<vo
 	// Set up shadow matrices for each face of the cube (to analyze the depth map from all 6 faces)
 	depthShader->bind();
 	for (int i = 0; i < 6; ++i) {
-		depthShader->setUniform4Mat("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+		depthShader->setUniform4Mat("shadowCubeFaces[" + std::to_string(i) + "]", shadowTransforms[i]);
 	}
 
-	depthShader->setUniform1f("far_plane", far);
-	depthShader->setUniform3Vec("lightPos", lightPos);
+	depthShader->setUniform1f("map_range", far);
+	depthShader->setUniform3Vec("lightPosition", lightPos);
 
 	// Draw everything that needs to be within the depth map
 	doDraw();

@@ -91,7 +91,7 @@ void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 		shader.setUniform4Mat("view", view);
 		shader.setUniform4Mat("projection", projection);
 		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("lightPosition", lightPos);
 		shader.setUniform3Vec("viewPos", cameraPos);
 		shader.setUniform3Vec("ourColor", glm::vec3(0.5f, 0.5f, 0.5f));
 		shader.setUniform1i("textureStatus", 0);
@@ -143,7 +143,7 @@ void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::m
 		shader.setUniform4Mat("view", view);
 		shader.setUniform4Mat("projection", projection);
 		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("lightPosition", lightPos);
 		shader.setUniform3Vec("viewPos", cameraPos);
 		shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
 		shader.setUniform1i("shininess", 32);
@@ -189,7 +189,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	// Set uniform variables
 	if (!isFindingDepth) {
 		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("lightPosition", lightPos);
 		shader.setUniform3Vec("viewPos", cameraPos);
 		shader.setUniform4Mat("projection", projection);
 		shader.setUniform4Mat("view", view);
@@ -302,7 +302,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 
 	if (!isFindingDepth) {
 		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("lightPosition", lightPos);
 		shader.setUniform3Vec("viewPos", cameraPos);
 		shader.setUniform4Mat("projection", projection);
 		shader.setUniform4Mat("view", view);
@@ -382,7 +382,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 	if (!isFindingDepth) {
 		// set all uniform variables
 		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-		shader.setUniform3Vec("lightPos", lightPos);
+		shader.setUniform3Vec("lightPosition", lightPos);
 		shader.setUniform3Vec("viewPos", cameraPos);
 		shader.setUniform4Mat("projection", projection);
 		shader.setUniform4Mat("view", view);

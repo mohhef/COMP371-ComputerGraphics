@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 
 		// telling the shader which textures go where
 		shader->bind();
-		shader->setUniform1i("diffuseTexture", 0);
+		shader->setUniform1i("textureObject", 0);
 		shader->setUniform1i("depthMap", 1);
 
 		// Setup for shadows
@@ -181,10 +181,10 @@ int main(int argc, char* argv[])
 
 			// bind universal attributes necessary for drawing all the objects on the map
 			shader->bind();
-			shader->setUniform3Vec("lightPos", lightPos);
+			shader->setUniform3Vec("lightPosition", lightPos);
 			shader->setUniform3Vec("viewPos", camera->position);
-			shader->setUniform1i("shadows", shadows);
-			shader->setUniform1f("far_plane", far);
+			shader->setUniform1i("drawShadows", shadows);
+			shader->setUniform1f("map_range", far);
 			depthMapper.bind();
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
