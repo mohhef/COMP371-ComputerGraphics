@@ -1,4 +1,5 @@
 #shader vertex
+// These shaders were heavily influenced by learnOpengl.com: https://learnopengl.com/
 #version 330 core
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec3 aNormal;
@@ -29,44 +30,96 @@ in vec3 FragPos;
 in vec2 Texture;
 
 uniform vec3 ourColor;
+
 uniform vec3 lightColor;
-uniform vec3 lightPos;
+uniform vec3 lightPosition;
 uniform vec3 viewPos;
+
 uniform sampler2D textureObject;
+uniform samplerCube depthMap;
+
+uniform float map_range;
+uniform bool drawShadows;
+
 uniform int textureStatus; // 1 indicates texture is being applied
 uniform int shininess;
 
+
+// array of offset direction for sampling
+vec3 gridSamplingDisk[20] = vec3[]
+(
+    vec3(1, 1, 1), vec3(1, -1, 1), vec3(-1, -1, 1), vec3(-1, 1, 1),
+    vec3(1, 1, -1), vec3(1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+    vec3(1, 1, 0), vec3(1, -1, 0), vec3(-1, -1, 0), vec3(-1, 1, 0),
+    vec3(1, 0, 1), vec3(-1, 0, 1), vec3(1, 0, -1), vec3(-1, 0, -1),
+    vec3(0, 1, 1), vec3(0, -1, 1), vec3(0, -1, -1), vec3(0, 1, -1)
+    );
+
+float ShadowCalculation(vec3 fragPos)
+{
+    // get vector between fragment position and light position
+    vec3 fragToLight = fragPos - lightPosition;
+    // use the fragment to light vector to sample from the depth map    
+    float closestDepth = texture(depthMap, fragToLight).r;
+    // currently in linear range between [0,1], so re-transform it back to original depth value
+    closestDepth *= map_range;
+    // now get length between the fragment and light position
+    float currentDepth = length(fragToLight);
+    // PCF
+     float shadow = 0.0;
+     float bias = 1.0; 
+     float samples = 4.0;
+     float offset = 0.1;
+     for(float x = -offset; x < offset; x += offset / (samples * 0.5))
+     {
+         for(float y = -offset; y < offset; y += offset / (samples * 0.5))
+         {
+             for(float z = -offset; z < offset; z += offset / (samples * 0.5))
+             {
+                 float closestDepth = texture(depthMap, fragToLight + vec3(x, y, z)).r; // use lightdir to lookup cubemap
+                 closestDepth *= map_range;   // Undo mapping [0;1]
+                 if(currentDepth - bias > closestDepth)
+                     shadow += 1.0;
+             }
+         }
+     }
+     shadow /= (samples * samples * samples);
+
+    return shadow;
+}
+
 void main()
 {
-    //ambient
-    float ambientFactor = 0.1;
-    vec3 ambientVal = ambientFactor * lightColor;
+    vec3 color;
+
+    if (textureStatus == 1)
+    {
+        // determine result with texture applied
+        color = ourColor * texture(textureObject, Texture).rgb;
+    }
+    else
+    {
+        // determine result without texture applied
+        color = ourColor;
+    }
+    vec3 ambientVal = 0.15 * color;
 
     // diffuse 
     vec3 norm = normalize(Normal);
-    vec3 lightDirection = normalize(lightPos - FragPos);
+    vec3 lightDirection = normalize(lightPosition - FragPos);
     float diff = max(dot(norm, lightDirection), 0.0);
     vec3 diffuseVal = diff * lightColor;
 
     // specular
     float specularFactor = 0.5;
     vec3 viewDirection = normalize(viewPos - FragPos);
-    vec3 reflectDirection = reflect(-lightDirection, norm);
-    float spec = pow(max(dot(viewDirection, reflectDirection), 0.0), shininess);
+    vec3 halfwayDirection = normalize(lightDirection + viewDirection);
+    float spec = pow(max(dot(norm, halfwayDirection), 0.0), shininess);
     vec3 specularVal = specularFactor * spec * lightColor;
 
-    vec3 result;
 
-    if (textureStatus == 1)
-    {
-        // determine result with texture applied
-        result = (ambientVal + diffuseVal + specularVal) * ourColor * texture(textureObject, Texture).rgb;
-    }
-    else
-    {
-        // determine result without texture applied
-        result = (ambientVal + diffuseVal + specularVal) * ourColor;
-    }
+    float shadow = drawShadows? ShadowCalculation(FragPos) : 0.0;
+    vec3 lighting = (ambientVal + (1.0 - shadow) * (diffuseVal + specularVal)) * color;
 
-    FragColor = vec4(result, 1.0f);
+    FragColor = vec4(lighting, 1.0f);
 }

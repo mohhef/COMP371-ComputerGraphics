@@ -22,14 +22,15 @@ private:
 	glm::mat4 rotationMatrix = glm::mat4(1.0f);
 	bool combinedRot = false;
 	static Renderer s_Instance;
+	bool isFindingDepth = false;
 	Renderer();
 
 public:
 	static Renderer& getInstance();
 	Renderer(const Renderer&) = delete;
-	void setRenderMethod(unsigned int method);
 	void setRenderCombinedRot(bool rot);
 	void setRenderIndex(unsigned int index);
+	void setIsFindingDepth(bool findDepth);
 
 	// draw functions
 	void clear() const;

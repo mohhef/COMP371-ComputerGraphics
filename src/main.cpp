@@ -15,9 +15,13 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <iostream>
+#include <string>
+
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "DepthMapper.h"
 
 #include "VertexArray.h"
 #include "VertexBufferLayout.h"
@@ -36,6 +40,7 @@ glm::vec3 displacement;
 float scaleFactor = 1.0f;
 bool combinedRot = false;
 bool textureStatus = true;
+bool shadows = true;
 
 // Cursor positions for mouse inputs
 float lastMouseX;
@@ -116,6 +121,15 @@ int main(int argc, char* argv[])
 		Shader* shader = new Shader("vertex_fragment.shader");
 		Shader* axesShader = new Shader("axes.shader");
 		Shader* lightingSourceShader = new Shader("lightingSource.shader");
+		Shader* depthShader = new Shader("depthMap.shader");
+
+		// telling the shader which textures go where
+		shader->bind();
+		shader->setUniform1i("textureObject", 0);
+		shader->setUniform1i("depthMap", 1);
+
+		// Setup for shadows
+		DepthMapper depthMapper;
 
 		// Renddering setup
 		Renderer& renderer = Renderer::getInstance();
@@ -156,18 +170,36 @@ int main(int argc, char* argv[])
 			glm::mat4 projection = glm::perspective(glm::radians(camera->zoom), (float)WIDTH / (float)HEIGHT, 0.1f, 200.0f);
 			glm::mat4 view = camera->getViewMatrix();
 
+			// used to afterwards draw the shadows
+			depthMapper.Draw(depthShader, lightPos, [&]() {
+				// Render objects to be drawn by the depth mapper object
+				renderer.drawObject(vA, *depthShader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
+				renderer.drawWall(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
+				renderer.drawStaticObjects(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
+
+				});
+
+			// bind universal attributes necessary for drawing all the objects on the map
+			shader->bind();
+			shader->setUniform3Vec("lightPosition", lightPos);
+			shader->setUniform3Vec("viewPos", camera->position);
+			shader->setUniform1i("drawShadows", shadows);
+			shader->setUniform1f("map_range", far);
+			depthMapper.bind();
+
 			// Render each object (wall, model, static models, axes, and mesh floor)
 			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
 			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
 			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
-			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
-			renderer.drawAxes(vaAxes, *axesShader, view, projection);
 
+			// draw the floor with tiles or draw the mesh depending on if we are drawing with or without textures
 			if (textureStatus)
 				renderer.drawFloor(vaFloor, *shader, view, projection, lightPos, camera->position, tileTexture);
 			else
 				renderer.drawMesh(vaMesh, *shader, view, projection, lightPos, camera->position, scaleFactor);
-			
+			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
+			renderer.drawAxes(vaAxes, *axesShader, view, projection);
+
 			// End frame
 			glfwSwapBuffers(window);
 
@@ -412,6 +444,10 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_Y) {
 		shuffleModel(models.at(modelIndex));
 		resetModel(true);
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+		shadows = !shadows;
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
