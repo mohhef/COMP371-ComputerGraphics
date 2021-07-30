@@ -125,8 +125,8 @@ int main(int argc, char* argv[])
 
 		// telling the shader which textures go where
 		shader->bind();
-		shader->setInt("diffuseTexture", 0);
-		shader->setInt("depthMap", 1);
+		shader->setUniform1i("diffuseTexture", 0);
+		shader->setUniform1i("depthMap", 1);
 
 		// Setup for shadows
 		DepthMapper depthMapper;

@@ -145,11 +145,6 @@ void Shader::unbind() const
 	GLCall(glUseProgram(0));
 }
 
-void Shader::setInt(const std::string& name, int value) const
-{
-	glUniform1i(glGetUniformLocation(id, name.c_str()), value);
-}
-
 void Shader::setUniform1i(const std::string& name, int i) {
 	glUniform1i(getUniformLocation(name), i);
 }
