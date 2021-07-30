@@ -173,9 +173,9 @@ int main(int argc, char* argv[])
 			// used to afterwards draw the shadows
 			depthMapper.Draw(depthShader, lightPos, [&]() {
 				// Render objects to be drawn by the depth mapper object
-				renderer.drawObject(vA, *depthShader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus, true);
-				renderer.drawWall(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus, true);
-				renderer.drawStaticObjects(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus, true);
+				renderer.drawObject(vA, *depthShader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
+				renderer.drawWall(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
+				renderer.drawStaticObjects(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
 
 				});
 
@@ -188,15 +188,15 @@ int main(int argc, char* argv[])
 			depthMapper.bind();
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
-			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus, false);
-			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus, false);
-			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus, false);
+			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
+			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
+			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
 
 			// draw the floor with tiles or draw the mesh depending on if we are drawing with or without textures
 			if (textureStatus)
-				renderer.drawFloor(vaFloor, *shader, view, projection, lightPos, camera->position, tileTexture, false);
+				renderer.drawFloor(vaFloor, *shader, view, projection, lightPos, camera->position, tileTexture);
 			else
-				renderer.drawMesh(vaMesh, *shader, view, projection, lightPos, camera->position, scaleFactor, false);
+				renderer.drawMesh(vaMesh, *shader, view, projection, lightPos, camera->position, scaleFactor);
 			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
 			renderer.drawAxes(vaAxes, *axesShader, view, projection);
 

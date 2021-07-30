@@ -78,6 +78,7 @@ public:
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO));
 		GLCall(glClear(GL_DEPTH_BUFFER_BIT));
 
+		Renderer::getInstance().setIsFindingDepth(true);
 		// Set up shadow matrices for each face of the cube (to analyze the depth map from all 6 faces)
 		depthShader->bind();
 		for (int i = 0; i < 6; ++i) {
@@ -89,6 +90,7 @@ public:
 
 		// Draw everything that needs to be within the depth map
 		doDraw();
+		Renderer::getInstance().setIsFindingDepth(false);
 
 		// Clean up depth map from buffer
 		GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0));

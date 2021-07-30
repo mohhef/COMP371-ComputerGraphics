@@ -46,6 +46,10 @@ void Renderer::setRenderCombinedRot(bool rot) {
 	combinedRot = rot;
 }
 
+void Renderer::setIsFindingDepth(bool findDepth) {
+	this->isFindingDepth = findDepth;
+}
+
 // Renderer for rendering the axes
 void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection)
 {
@@ -76,11 +80,11 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 }
 
 // Renderer for drawing the mesh
-void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, float scaleFactor, bool findDepth)
+void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, float scaleFactor)
 {
 	// Binding vertex array and shader
 	va.bind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.bind();
 
 		//Setting all uniform variables
@@ -118,24 +122,24 @@ void Renderer::drawMesh(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 
 	// Unbinding for easier debugging
 	va.unbind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.unbind();
 	}
 	
 }
 
 // Renderer for drawing floor (with texture)
-void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, bool findDepth)
+void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture)
 {
 	// Binding vertex array and shader
 	va.bind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.bind();
 	}
 	texture.bind();
 
 	// Setting all uniform variables
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.setUniform4Mat("view", view);
 		shader.setUniform4Mat("projection", projection);
 		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -156,14 +160,14 @@ void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::m
 
 	// unbind for easier debugging
 	va.unbind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.unbind();
 	}
 	texture.unbind();
 }
 
 // Renderer for drawing the static models and walls at the corners of the map
-void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel, bool status, bool findDepth) 
+void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel, bool status) 
 {
 	// Translation to put non-centered models
 	vector<glm::mat4> corners = 
@@ -177,13 +181,13 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 
 	// Binding vertex array and shader
 	va.bind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.bind();
 	}
 	textureModel.bind();
 
 	// Set uniform variables
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 		shader.setUniform3Vec("lightPos", lightPos);
 		shader.setUniform3Vec("viewPos", cameraPos);
@@ -193,7 +197,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	
 
 	// Handle texture display toggle
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		if (status)
 		{
 			shader.setUniform1i("textureStatus", 1);
@@ -236,7 +240,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	textureModel.unbind();
 	textureWall.bind();
 
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		// Set uniform variables
 		shader.setUniform1i("shininess", 32);
 
@@ -280,23 +284,23 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	}
 
 	va.unbind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.unbind();
 	}
 	textureWall.unbind();
 }
 
 // Draw the model that is currently in use
-void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, bool status, bool findDepth)
+void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, bool status)
 {
 	// Bind the vertex array and shader
 	va.bind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.bind();
 	}
 	texture.bind();
 
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 		shader.setUniform3Vec("lightPos", lightPos);
 		shader.setUniform3Vec("viewPos", cameraPos);
@@ -336,7 +340,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 
 	// unbind for easier debugging
 	va.unbind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.unbind();
 	}
 	
@@ -366,16 +370,16 @@ void Renderer::drawLightingSource(VertexArray& va, Shader& shader, glm::mat4 vie
 }
 
 // Draw the wall that is currently in use
-void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, bool status, bool findDepth)
+void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, bool status)
 {
 	// bind the vertex array and shader
 	va.bind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.bind();
 	}
 	texture.bind();
 
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		// set all uniform variables
 		shader.setUniform3Vec("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 		shader.setUniform3Vec("lightPos", lightPos);
@@ -425,7 +429,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
   
 	// unbind for easier debugging
 	va.unbind();
-	if (!findDepth) {
+	if (!isFindingDepth) {
 		shader.unbind();
 	}
 	texture.unbind();
