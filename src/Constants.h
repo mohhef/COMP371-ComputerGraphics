@@ -12,13 +12,13 @@ static float lastFrame = 0.0f; // Time at which last frame was buffered
 static float wallZPos = -10.0f; // wall offset from origin
 static int modelIndex = 0; // initial index to display the model
 
-// Window size
-static const int HEIGHT = 768;
-static const int WIDTH = 1024;
+// External window size and cursor position paramters
+// Defined in main.cpp
+extern int HEIGHT;
+extern int WIDTH;
+extern float lastX;
+extern float lastY;
 
-// Cursor position parameters
-static float lastX = WIDTH / 2;
-static float lastY = HEIGHT / 2;
 static bool initialMousePos = true;
 
 

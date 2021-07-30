@@ -32,6 +32,8 @@
 
 using namespace std;
 
+
+
 // Modified throughout run and to reset between runs.
 // Possibly bound to a single model (modelIndex)
 vector<glm::mat4> modelTransMat;
@@ -62,9 +64,16 @@ void randomRotation();
 int getTotalCubes(vector <vector<int>> model);
 unsigned int loadTexture(char const* path);
 
-
 vector<vector<glm::vec3>> modelCubePositions;
 vector<vector<glm::vec3>> wallCubePositions;
+
+// Window size
+int HEIGHT = 768;
+int WIDTH = 1024;
+
+// Cursor position parameters
+float lastX = WIDTH / 2;
+float lastY = HEIGHT / 2;
 
 // main function
 int main(int argc, char* argv[])
@@ -216,6 +225,8 @@ int main(int argc, char* argv[])
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
 	glViewport(0, 0, width, height);
+	HEIGHT = height;
+	WIDTH = width;
 }
 
 GLFWwindow* initializeWindow()
