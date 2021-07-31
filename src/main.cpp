@@ -62,7 +62,6 @@ void createModel(vector<vector<int>> model);
 void shuffleModel(vector<vector<int>> model);
 void randomRotation();
 int getTotalCubes(vector <vector<int>> model);
-unsigned int loadTexture(char const* path);
 
 vector<vector<glm::vec3>> modelCubePositions;
 vector<vector<glm::vec3>> wallCubePositions;
@@ -92,6 +91,13 @@ int main(int argc, char* argv[])
 		layout.push<float>(3);
 		layout.push<float>(2);
 		vA.addBuffer(vB, layout);
+		
+		// Setup for boundary
+		VertexArray vaBound;
+		VertexBuffer vbBound(cubeVertices, sizeof(cubeVertices));
+		VertexBufferLayout layoutBound;
+		layoutBound.push<float>(3);
+		vaBound.addBuffer(vbBound, layoutBound);
 
 		// Setup for lighting
 		VertexArray vaLightingSource;
@@ -182,9 +188,9 @@ int main(int argc, char* argv[])
 			// used to afterwards draw the shadows
 			depthMapper.Draw(depthShader, lightPos, [&]() {
 				// Render objects to be drawn by the depth mapper object
-				renderer.drawObject(vA, *depthShader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
-				renderer.drawWall(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
-				renderer.drawStaticObjects(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
+				renderer.drawObject(vA, *depthShader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement);
+				renderer.drawWall(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement);
+				renderer.drawStaticObjects(vA, *depthShader, view, projection, lightPos, camera->position, brickTexture, metalTexture);
 
 				});
 
@@ -197,9 +203,12 @@ int main(int argc, char* argv[])
 			depthMapper.bind();
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
-			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement, textureStatus);
-			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement, textureStatus);
-			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture, textureStatus);
+			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement);
+			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement);
+			renderer.drawBoundary(vaBound, *axesShader, view, projection, modelRotMat, modelTransMat, scaleFactor, displacement);
+			renderer.drawStaticObjects(vA, *shader, view, projection, lightPos, camera->position, brickTexture, metalTexture);
+			renderer.drawLightingSource(vaLightingSource, *lightingSourceShader, view, projection, lightPos);
+			renderer.drawAxes(vaAxes, *axesShader, view, projection);
 
 			// draw the floor with tiles or draw the mesh depending on if we are drawing with or without textures
 			if (textureStatus)
@@ -461,8 +470,10 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		shadows = !shadows;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
 		textureStatus = !textureStatus;
+		Renderer::getInstance().isTextureEnabled = textureStatus;
+	}
 }
 
 // Function for processing mouse input

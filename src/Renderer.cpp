@@ -167,7 +167,7 @@ void Renderer::drawFloor(VertexArray& va, Shader& shader, glm::mat4 view, glm::m
 }
 
 // Renderer for drawing the static models and walls at the corners of the map
-void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel, bool status) 
+void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& textureWall, Texture& textureModel) 
 {
 	// Translation to put non-centered models
 	vector<glm::mat4> corners = 
@@ -198,7 +198,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 
 	// Handle texture display toggle
 	if (!isFindingDepth) {
-		if (status)
+		if (isTextureEnabled)
 		{
 			shader.setUniform1i("textureStatus", 1);
 			shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
@@ -245,7 +245,7 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 		shader.setUniform1i("shininess", 32);
 
 		// Handle texture display toggle
-		if (status)
+		if (isTextureEnabled)
 		{
 			shader.setUniform1i("textureStatus", 1);
 			shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));
@@ -290,8 +290,36 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	textureWall.unbind();
 }
 
+void Renderer::drawBoundary(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement)
+{
+	va.bind();
+	shader.bind();
+
+	shader.setUniform4Mat("projection", projection);
+	shader.setUniform4Mat("view", view);
+	GLfloat timeVal = glfwGetTime();
+	GLfloat greenVal = (sin(timeVal) / 2) + 0.5;
+	shader.setUniform4Vec("ourColor", glm::vec4(0.0, greenVal, 0.0, 1.0));
+	int numCubePieces = modelCubePositions.at(renderIndex).size();
+	for (int i = 0; i < numCubePieces; i++) {
+		// adjust position based on user input
+		glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(displacement.x, 0.0f, displacement.z));
+		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(renderIndex));
+
+		// unit matrix * scaling input * xz_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
+		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i) * modelScale.at(renderIndex) * modelTransMat.at(i);
+
+		shader.setUniform4Mat("model", model);
+		glDrawArrays(GL_LINES, 0, 24);
+	}
+	// unbind for easier debugging
+	va.unbind();
+	shader.unbind();
+}
+
+
 // Draw the model that is currently in use
-void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement, bool status)
+void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, vector<glm::mat4> modelTransMat, float scaleFactor, glm::vec3 displacement)
 {
 	// Bind the vertex array and shader
 	va.bind();
@@ -308,7 +336,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 		shader.setUniform4Mat("view", view);
 
 		// handle texture display toggle
-		if (status)
+		if (isTextureEnabled)
 		{
 			shader.setUniform1i("textureStatus", 1);
 			shader.setUniform3Vec("ourColor", glm::vec3(0.0f, 1.0f, 1.0f));
@@ -324,7 +352,6 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 	
 
 	int numCubePieces = modelCubePositions.at(renderIndex).size();
-	float time = (float)glfwGetTime();
 	// draw the model from all the cubes
 	for (int i = 0; i < numCubePieces; i++){
 		// adjust position based on user input
@@ -332,7 +359,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(renderIndex));
 
 		// unit matrix * scaling input * xz_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
-		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i) * modelScale.at(renderIndex) * modelTransMat.at(i);
+		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i)* modelScale.at(renderIndex) *modelTransMat.at(i);
 
 		shader.setUniform4Mat("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -370,7 +397,7 @@ void Renderer::drawLightingSource(VertexArray& va, Shader& shader, glm::mat4 vie
 }
 
 // Draw the wall that is currently in use
-void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement, bool status)
+void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos, Texture& texture, vector<glm::mat4> modelRotMat, float scaleFactor, glm::vec3 displacement)
 {
 	// bind the vertex array and shader
 	va.bind();
@@ -389,7 +416,7 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 		shader.setUniform1i("shininess", 32);
 
 		// handle texture display toggle
-		if (status)
+		if (isTextureEnabled)
 		{
 			shader.setUniform1i("textureStatus", 1);
 			shader.setUniform3Vec("ourColor", glm::vec3(1.0f, 1.0f, 1.0f));

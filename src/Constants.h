@@ -22,7 +22,38 @@ extern float lastY;
 static bool initialMousePos = true;
 
 
+static float cubeVertices[] = {
 
+-0.5f, 0.5f, 0.5f,
+0.5f, 0.5f, 0.5f,
+0.5f, 0.5f, 0.5f,
+0.5f, -0.5f, 0.5f,
+
+0.5f, -0.5f, 0.5f,
+-0.5f, -0.5f, 0.5f,
+-0.5f, -0.5f, 0.5f,
+-0.5f, 0.5f,0.5f,
+
+0.5f, 0.5f, 0.5f,
+0.5f, 0.5f, -0.5f,
+0.5f, 0.5f, -0.5f,
+0.5f, -0.5f, -0.5f,
+
+  0.5f, -0.5f, -0.5f,
+  0.5f, -0.5f, 0.5f,
+  0.5f, 0.5f, -0.5f,
+-0.5f, 0.5f, -0.5f,
+
+-0.5f, -0.5f, -0.5,
+  0.5f, -0.5f, -0.5f,
+-0.5f, -0.5f, -0.5,
+-0.5f,  0.5f, -0.5f,
+
+-0.5f,  0.5f, -0.5f,
+-0.5f,  0.5f,  0.5f,
+-0.5f, -0.5f,  0.5f,
+-0.5f, -0.5f, -0.5,
+};
 //Position(f,f,f) Normal(f,f,f) Texture(f,f)
 static float vertices[] =
 {
@@ -168,4 +199,3 @@ static vector<glm::vec3> modelPosition =
 	glm::vec3(0.0f, 1.0f, 10.0f),
 	glm::vec3(0.0f, 1.0f, 10.0f)
 };
-
