@@ -176,8 +176,8 @@ void Renderer::drawStaticObjects(VertexArray& va, Shader& shader, glm::mat4 view
 	{
 		glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, -30.0f)),
 		glm::translate(glm::mat4(1.0f), glm::vec3(30.0f, 0.0f, -30.0f)),
-		glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 30.0f, -30.0f)),
-		glm::translate(glm::mat4(1.0f), glm::vec3(30.0f, 30.0f, -30.0f)),
+		glm::translate(glm::mat4(1.0f), glm::vec3(-30.0f, 0.0f, 35.0f)),
+		glm::translate(glm::mat4(1.0f), glm::vec3(30.0f, 0.0f, 35.0f)),
 		glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 30.0f, -30.0f)),
 	};
 
