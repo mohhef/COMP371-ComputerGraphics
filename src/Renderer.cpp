@@ -297,8 +297,8 @@ void Renderer::drawBoundary(VertexArray& va, Shader& shader, glm::mat4 view, glm
 
 	shader.setUniform4Mat("projection", projection);
 	shader.setUniform4Mat("view", view);
-	GLfloat timeValue = glfwGetTime();
-	GLfloat greenValue = (sin(timeValue) / 2) + 0.5;
+	GLfloat timeVal = glfwGetTime();
+	GLfloat greenVal = (sin(timeValue) / 2) + 0.5;
 	shader.setUniform4Vec("ourColor", glm::vec4(0.0, greenValue, 0.0, 1.0));
 	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	for (int i = 0; i < numCubePieces; i++) {
