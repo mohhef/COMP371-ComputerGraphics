@@ -55,6 +55,7 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 {
 	va.bind();
 	shader.bind();
+	glLineWidth(4);
 
 	glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(5));
 
@@ -77,6 +78,7 @@ void Renderer::drawAxes(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 
 	va.unbind();
 	shader.unbind();
+	glLineWidth(1);
 }
 
 // Renderer for drawing the mesh
@@ -294,6 +296,7 @@ void Renderer::drawBoundary(VertexArray& va, Shader& shader, glm::mat4 view, glm
 {
 	va.bind();
 	shader.bind();
+	glLineWidth(4);
 
 	shader.setUniform4Mat("projection", projection);
 	shader.setUniform4Mat("view", view);
@@ -352,6 +355,7 @@ void Renderer::drawBoundary(VertexArray& va, Shader& shader, glm::mat4 view, glm
 	// unbind for easier debugging
 	va.unbind();
 	shader.unbind();
+	glLineWidth(1);
 }
 
 // Draw the model that is currently in use

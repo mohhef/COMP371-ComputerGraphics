@@ -18,6 +18,8 @@ Simply load the solution (ideally in `VS2019`) and run `main.cpp`.
 - CTR + a/d: rotate model and wall along Y-axis.
 - P/L/T: toggle object display between point, line, and fill, respectively.
 - X: toggle textures
+- B: toggle shadows
+- Y: shuffle model
 - U/J: scale model.
 - UP/DOWN: rotate camera along X-axis.
 - LEFT/RIGHT: rotate camera along Y-axis.

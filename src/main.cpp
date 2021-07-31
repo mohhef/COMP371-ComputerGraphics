@@ -461,16 +461,19 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// Shuffle models
-	if (key == GLFW_KEY_Y) {
+	if (key == GLFW_KEY_Y) 
+	{
 		shuffleModel(models.at(modelIndex));
 		resetModel(true);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) 
+	{
 		shadows = !shadows;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) 
+	{
 		textureStatus = !textureStatus;
 		Renderer::getInstance().isTextureEnabled = textureStatus;
 	}
