@@ -23,6 +23,7 @@ private:
 	bool combinedRot = false;
 	static Renderer s_Instance;
 	bool isFindingDepth = false;
+	glm::vec3 centerOfMass;
 	Renderer();
 
 public:
@@ -32,6 +33,7 @@ public:
 	void setRenderCombinedRot(bool rot);
 	void setRenderIndex(unsigned int index);
 	void setIsFindingDepth(bool findDepth);
+	void updateCenterOfMass();
 
 	// draw functions
 	void clear() const;

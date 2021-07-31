@@ -203,6 +203,7 @@ int main(int argc, char* argv[])
 			depthMapper.bind();
 
 			// Render each object (wall, model, static models, axes, and mesh floor)
+			renderer.updateCenterOfMass();
 			renderer.drawObject(vA, *shader, view, projection, lightPos, camera->position, metalTexture, modelRotMat, modelTransMat, scaleFactor, displacement);
 			renderer.drawWall(vA, *shader, view, projection, lightPos, camera->position, brickTexture, modelRotMat, scaleFactor, displacement);
 			renderer.drawBoundary(vaBound, *axesShader, view, projection, modelRotMat, modelTransMat, scaleFactor, displacement);
@@ -461,16 +462,19 @@ void processInput(GLFWwindow* window, int key, int scancode, int action, int mod
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// Shuffle models
-	if (key == GLFW_KEY_Y) {
+	if (key == GLFW_KEY_Y) 
+	{
 		shuffleModel(models.at(modelIndex));
 		resetModel(true);
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS) 
+	{
 		shadows = !shadows;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS) 
+	{
 		textureStatus = !textureStatus;
 		Renderer::getInstance().isTextureEnabled = textureStatus;
 	}
