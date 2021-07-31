@@ -297,7 +297,9 @@ void Renderer::drawBoundary(VertexArray& va, Shader& shader, glm::mat4 view, glm
 
 	shader.setUniform4Mat("projection", projection);
 	shader.setUniform4Mat("view", view);
-	shader.setUniform4Vec("ourColor", glm::vec4(0.0, 1.0, 0.0, 1.0));
+	GLfloat timeValue = glfwGetTime();
+	GLfloat greenValue = (sin(timeValue) / 2) + 0.5;
+	shader.setUniform4Vec("ourColor", glm::vec4(0.0, greenValue, 0.0, 1.0));
 	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	for (int i = 0; i < numCubePieces; i++) {
 		// adjust position based on user input
@@ -357,7 +359,7 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 		glm::mat4 initialPos = glm::translate(glm::mat4(1.0f), modelPosition.at(renderIndex));
 
 		// unit matrix * scaling input * xz_translation * model_translation (align with hole) * model_rotation * model_cube_scale * model_cube_translation
-		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i) * modelScale.at(renderIndex) * modelTransMat.at(i);
+		glm::mat4 model = glm::mat4(1.0f) * glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor)) * trans * initialPos * modelRotMat.at(i)* modelScale.at(renderIndex) *modelTransMat.at(i);
 
 		shader.setUniform4Mat("model", model);
 		glDrawArrays(GL_TRIANGLES, 0, 36);
