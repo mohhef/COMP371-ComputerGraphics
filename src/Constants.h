@@ -21,7 +21,7 @@ extern float lastY;
 
 static bool initialMousePos = true;
 
-
+//cube verticies used for line rendering
 static float cubeVertices[] = {
 
 -0.5f, 0.5f, 0.5f,
@@ -54,6 +54,7 @@ static float cubeVertices[] = {
 -0.5f, -0.5f,  0.5f,
 -0.5f, -0.5f, -0.5,
 };
+//cube verticies used for triangle rendering
 //Position(f,f,f) Normal(f,f,f) Texture(f,f)
 static float vertices[] =
 {
