@@ -304,35 +304,8 @@ void Renderer::drawBoundary(VertexArray& va, Shader& shader, glm::mat4 view, glm
 	GLfloat greenVal = (sin(timeVal) / 2) + 0.5;
 	shader.setUniform4Vec("ourColor", glm::vec4(0.0, greenVal, 0.0, 1.0));
 
-	// calculate center of mass for rotation
-	int numCubePieces = modelCubePositions.at(renderIndex).size();
-	glm::vec3 centerOfMass = glm::vec3(0.0f);
-	glm::vec3 numOfCubes = glm::vec3(0.0f);
-	for (int i = 0; i < numCubePieces; i++)
-	{
-		if (modelCubePositions.at(renderIndex).at(i).x != 0)
-		{
-			centerOfMass.x += modelCubePositions.at(renderIndex).at(i).x;
-			numOfCubes.x++;
-		}
-
-		if (modelCubePositions.at(renderIndex).at(i).y != 0)
-		{
-			centerOfMass.y += modelCubePositions.at(renderIndex).at(i).y;
-			numOfCubes.y++;
-		}
-
-		if (modelCubePositions.at(renderIndex).at(i).z != 0)
-		{
-			centerOfMass.z += modelCubePositions.at(renderIndex).at(i).z;
-			numOfCubes.z++;
-		}
-	}
-	centerOfMass.x /= numOfCubes.x;
-	centerOfMass.y /= numOfCubes.y;
-	centerOfMass.z /= numOfCubes.z;
-
 	// draw cubes for model
+	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	for (int i = 0; i < numCubePieces; i++) 
 	{
 		// adjust position based on user input
@@ -390,35 +363,8 @@ void Renderer::drawObject(VertexArray& va, Shader& shader, glm::mat4 view, glm::
 		}
 	}
 	
-	// calculate center of mass for rotation
-	int numCubePieces = modelCubePositions.at(renderIndex).size();
-	glm::vec3 centerOfMass = glm::vec3(0.0f);
-	glm::vec3 numOfCubes = glm::vec3(0.0f);
-	for (int i = 0; i < numCubePieces; i++)
-	{
-		if (modelCubePositions.at(renderIndex).at(i).x != 0)
-		{
-			centerOfMass.x += modelCubePositions.at(renderIndex).at(i).x;
-			numOfCubes.x++;
-		}
-
-		if (modelCubePositions.at(renderIndex).at(i).y != 0)
-		{
-			centerOfMass.y += modelCubePositions.at(renderIndex).at(i).y;
-			numOfCubes.y++;
-		}
-
-		if (modelCubePositions.at(renderIndex).at(i).z != 0)
-		{
-			centerOfMass.z += modelCubePositions.at(renderIndex).at(i).z;
-			numOfCubes.z++;
-		}
-	}
-	centerOfMass.x /= numOfCubes.x;
-	centerOfMass.y /= numOfCubes.y;
-	centerOfMass.z /= numOfCubes.z;
-
 	// draw cubes for model
+	int numCubePieces = modelCubePositions.at(renderIndex).size();
 	for (int i = 0; i < numCubePieces; i++)
 	{
 		// adjust position based on user input
@@ -534,4 +480,35 @@ void Renderer::drawWall(VertexArray& va, Shader& shader, glm::mat4 view, glm::ma
 		shader.unbind();
 	}
 	texture.unbind();
+}
+
+void Renderer::updateCenterOfMass()
+{
+	int numCubePieces = modelCubePositions.at(renderIndex).size();
+	centerOfMass = glm::vec3(0.0f);
+	glm::vec3 numOfCubes = glm::vec3(0.0f);
+
+	for (int i = 0; i < numCubePieces; i++)
+	{
+		if (modelCubePositions.at(renderIndex).at(i).x != 0)
+		{
+			centerOfMass.x += modelCubePositions.at(renderIndex).at(i).x;
+			numOfCubes.x++;
+		}
+
+		if (modelCubePositions.at(renderIndex).at(i).y != 0)
+		{
+			centerOfMass.y += modelCubePositions.at(renderIndex).at(i).y;
+			numOfCubes.y++;
+		}
+
+		if (modelCubePositions.at(renderIndex).at(i).z != 0)
+		{
+			centerOfMass.z += modelCubePositions.at(renderIndex).at(i).z;
+			numOfCubes.z++;
+		}
+	}
+	centerOfMass.x /= numOfCubes.x;
+	centerOfMass.y /= numOfCubes.y;
+	centerOfMass.z /= numOfCubes.z;
 }
