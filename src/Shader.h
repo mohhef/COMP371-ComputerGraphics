@@ -8,13 +8,15 @@
 struct ShaderProgramSource {
 	std::string vertexSource;
 	std::string fragmentSource;
+	std::string geometrySource;
 };
 
 enum class ShaderType
 {
 	NONE = -1, 
 	VERTEX = 0, 
-	FRAGMENT = 1
+	FRAGMENT = 1,
+	GEOMETRY = 2
 };
 
 class Shader 
@@ -36,7 +38,7 @@ public:
 
 	unsigned int  compileShader(unsigned int type, const std::string& source);
 	ShaderProgramSource parseShader(const std::string& filepath);
-	unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader);
+	unsigned int createShader(const std::string& vertexShader, const std::string& fragmentShader, const std::string& geometryShader);
 
 private:
 	std::string filePath;

@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DepthMapper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DepthMapper.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Constants.h" />
@@ -166,6 +168,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="axes.shader" />
+    <None Include="depthMap.shader" />
     <None Include="lightingSource.shader" />
     <None Include="vertex_fragment.shader" />
   </ItemGroup>

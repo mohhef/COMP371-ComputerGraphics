@@ -5,6 +5,7 @@ using namespace std;
 class Texture 
 {
 public:
+	unsigned int id; // texture id
 	Texture(const std::string& path);
 	~Texture();
 	
@@ -15,7 +16,6 @@ public:
 	inline int getHeight() const { return height; };
 
 private:
-	unsigned int id; // texture id
 	string filePath; // file path to texture
 	unsigned char* data; // holds all data
 	int width, height, nrChannels; 
