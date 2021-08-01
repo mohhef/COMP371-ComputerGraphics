@@ -37,10 +37,10 @@ Simply load the solution (ideally in `VS2019`) and run `main.cpp`.
 
 Mohamed Hefny | 40033382  
 Nicholas Nagy | 40059460  
-Manpreet Tahim | 26592066
-Yida Li |27033850
-Efe Harmankaya | 40077277
-Yongsu Huang | 40181720
+Manpreet Tahim | 26592066  
+Yida Li |27033850  
+Efe Harmankaya | 40077277  
+Yongsu Huang | 40181720  
 
 ## References  
 
