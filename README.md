@@ -1,7 +1,9 @@
 # COMP371-ComputerGraphics
 
 ## Description  
-Introductionary OpengL programming assignment. This project revolves around creating virtual scenes which consists of several objects, all of which can be manipulated in various transformations. It also invovles setting up and manipulating a virtual camera and toggling between different sets of display (points, lines and solid). 
+Introductionary OpengL programming assignment. This project revolves around creating virtual scenes which consists of several objects, all of which can be manipulated in various transformations. It also invovles setting up and manipulating a virtual camera and toggling between different sets of display (points, lines and solid).
+It involves lighting, shadow and textures as well.
+ 
 
 ## Setup
 The project directory contains source code, and external libraries and headers. Solution is setup to automatically include them upon load. 
@@ -36,6 +38,8 @@ Simply load the solution (ideally in `VS2019`) and run `main.cpp`.
 Mohamed Hefny | 40033382  
 Nicholas Nagy | 40059460  
 Manpreet Tahim | 26592066
+Yida Li |27033850
+Efe Harmankaya | 40077277
 
 ## References  
 
